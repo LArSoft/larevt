@@ -1,0 +1,16 @@
+BEGIN_PROLOG
+
+standard_chargeyield:
+{
+  EnableChargeYield: false
+  service_provider:  ChargeYieldServiceStandard
+}
+
+bo_chargeyield:         @local::standard_chargeyield
+jp250L_chargeyield:     @local::standard_chargeyield
+argoneut_chargeyield:   @local::standard_chargeyield
+microboone_chargeyield: @local::standard_chargeyield
+dune35t_chargeyield:    @local::standard_chargeyield
+dunefd_chargeyield:     @local::standard_chargeyield
+
+END_PROLOG
