@@ -6,4 +6,3 @@ art_make(SERVICE_LIBRARIES
          )
 
 install_headers()
-install_source()

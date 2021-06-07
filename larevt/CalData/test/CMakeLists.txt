@@ -13,8 +13,12 @@ simple_plugin(FFTTest "module"
 
 	                ${FHICLCPP}
 			cetlib cetlib_except
-			${ROOT_BASIC_LIB_LIST}
-
+			ROOT::ROOTDataFrame
+			ROOT::Physics
+			ROOT::Geom
+			ROOT::FFTW
+			ROOT::Tree
+			ROOT::Core
 )
 
 install_headers()
