@@ -6,7 +6,7 @@ simple_plugin(CalWireAna "module"
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
               ${ART_ROOT_IO_TFILESERVICE_SERVICE}
               ${ART_ROOT_IO_TFILE_SUPPORT}
-	      ${MF_MESSAGELOGGER}
+	      messagefacility::MFMessageLogger
               ROOT::Core
               ROOT::Hist
               ROOT::MathCore)
@@ -16,7 +16,7 @@ simple_plugin(CalWire "module"
               lardataobj_RawData
               lardata_ArtDataHelper
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
-              ${MF_MESSAGELOGGER}
+              messagefacility::MFMessageLogger
               ROOT::Core
               ROOT::Hist
               ROOT::MathCore
@@ -27,7 +27,7 @@ simple_plugin(CalWireT962 "module"
               lardataobj_RawData
               lardata_ArtDataHelper
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
-              ${MF_MESSAGELOGGER}
+              messagefacility::MFMessageLogger
               ROOT::Core
               ROOT::Hist
               ROOT::MathCore

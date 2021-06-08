@@ -2,9 +2,9 @@ cet_enable_asserts()
 
 simple_plugin ( SimpleChannelStatusTest "module"
                     larevt_Filters
-                    ${MF_MESSAGELOGGER}
+                    messagefacility::MFMessageLogger
                     
-                    ${FHICLCPP}
+                    fhiclcpp::fhiclcpp fhiclcpp::types
                     cetlib cetlib_except
                     ${ROOT_BASIC_LIB_LIST}
               )
@@ -19,7 +19,7 @@ cet_test(SimpleChannelStatus_test
   SOURCES SimpleChannelStatus_test.cxx
   LIBRARIES larevt_Filters
             larevt_CalibrationDBI_IOVData
-            ${FHICLCPP}
+            fhiclcpp::fhiclcpp fhiclcpp::types
   USE_BOOST_UNIT
 )
 
