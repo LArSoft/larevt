@@ -2,7 +2,7 @@ cet_enable_asserts()
 
 simple_plugin ( SimpleChannelStatusTest "module"
                     larevt_Filters
-                    messagefacility::MFMessageLogger
+                    messagefacility::MF_MessageLogger
                     
                     fhiclcpp::fhiclcpp fhiclcpp::types
                     cetlib cetlib_except

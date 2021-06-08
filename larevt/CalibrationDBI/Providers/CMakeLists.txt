@@ -7,7 +7,7 @@ art_make(LIB_LIBRARIES
            larevt_CalibrationDBI_IOVData
            ${LIBWDA}
            ${SQLITE}
-           messagefacility::MFMessageLogger
+           messagefacility::MF_MessageLogger
            fhiclcpp::fhiclcpp fhiclcpp::types
            canvas
            cetlib

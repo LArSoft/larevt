@@ -3,7 +3,7 @@ art_make(LIB_LIBRARIES
            lardataobj_RecoBase
            ${ART_FRAMEWORK_SERVICES_REGISTRY}
            canvas
-           messagefacility::MFMessageLogger
+           messagefacility::MF_MessageLogger
            fhiclcpp::fhiclcpp fhiclcpp::types
            cetlib_except
          MODULE_LIBRARIES
@@ -11,7 +11,7 @@ art_make(LIB_LIBRARIES
            ${ART_FRAMEWORK_SERVICES_REGISTRY}
            ${ART_ROOT_IO_TFILESERVICE_SERVICE}
            ${ART_ROOT_IO_TFILE_SUPPORT}
-           messagefacility::MFMessageLogger
+           messagefacility::MF_MessageLogger
            ROOT::Core
            ROOT::Hist
            ROOT::Physics
@@ -21,7 +21,7 @@ art_make(LIB_LIBRARIES
            nusimdata_SimulationBase
          SERVICE_LIBRARIES
            larevt_Filters
-           messagefacility::MFMessageLogger
+           messagefacility::MF_MessageLogger
            ROOT::Core
          )
 

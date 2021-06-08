@@ -9,7 +9,7 @@ simple_plugin(FFTTest "module"
 			art_Persistency_Provenance
 	 		art_Utilities
                         canvas
-			messagefacility::MFMessageLogger
+			messagefacility::MF_MessageLogger
 
 	                fhiclcpp::fhiclcpp fhiclcpp::types
 			cetlib cetlib_except
