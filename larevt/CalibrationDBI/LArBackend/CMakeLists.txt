@@ -1,4 +1,3 @@
-fhiclcpp::fhiclcpp fhiclcpp::typesafhiclcpp::fhiclcpp fhiclcpp::typesdfhiclcpp::fhiclcpp fhiclcpp::typesdfhiclcpp::fhiclcpp fhiclcpp::types_fhiclcpp::fhiclcpp fhiclcpp::typessfhiclcpp::fhiclcpp fhiclcpp::typesufhiclcpp::fhiclcpp fhiclcpp::typesbfhiclcpp::fhiclcpp fhiclcpp::typesdfhiclcpp::fhiclcpp fhiclcpp::typesifhiclcpp::fhiclcpp fhiclcpp::typesrfhiclcpp::fhiclcpp fhiclcpp::typesefhiclcpp::fhiclcpp fhiclcpp::typescfhiclcpp::fhiclcpp fhiclcpp::typestfhiclcpp::fhiclcpp fhiclcpp::typesofhiclcpp::fhiclcpp fhiclcpp::typesrfhiclcpp::fhiclcpp fhiclcpp::typesyfhiclcpp::fhiclcpp fhiclcpp::types(fhiclcpp::fhiclcpp fhiclcpp::typesjfhiclcpp::fhiclcpp fhiclcpp::typesofhiclcpp::fhiclcpp fhiclcpp::typesbfhiclcpp::fhiclcpp fhiclcpp::types)fhiclcpp::fhiclcpp fhiclcpp::types
-fhiclcpp::fhiclcpp fhiclcpp::typesfhiclcpp::fhiclcpp fhiclcpp::types
-fhiclcpp::fhiclcpp fhiclcpp::typesfhiclcpp::fhiclcpp fhiclcpp::typesifhiclcpp::fhiclcpp fhiclcpp::typesnfhiclcpp::fhiclcpp fhiclcpp::typessfhiclcpp::fhiclcpp fhiclcpp::typestfhiclcpp::fhiclcpp fhiclcpp::typesafhiclcpp::fhiclcpp fhiclcpp::typeslfhiclcpp::fhiclcpp fhiclcpp::typeslfhiclcpp::fhiclcpp fhiclcpp::types_fhiclcpp::fhiclcpp fhiclcpp::typesffhiclcpp::fhiclcpp fhiclcpp::typeshfhiclcpp::fhiclcpp fhiclcpp::typesifhiclcpp::fhiclcpp fhiclcpp::typescfhiclcpp::fhiclcpp fhiclcpp::typeslfhiclcpp::fhiclcpp fhiclcpp::types(fhiclcpp::fhiclcpp fhiclcpp::types)fhiclcpp::fhiclcpp fhiclcpp::types
-fhiclcpp::fhiclcpp fhiclcpp::types
+add_subdirectory(job)
+
+install_fhicl()
