@@ -37,7 +37,7 @@ find_ups_product( art )
 find_ups_product(art_root_io)
 find_ups_product( messagefacility )
 find_ups_root()
-find_ups_product( postgresql )
+find_package( postgresql )
 find_ups_product( libwda )
 
 # macros for dictionary and simple_plugin
