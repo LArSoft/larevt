@@ -1,5 +1,6 @@
 cet_find_library(LIBWDA NAMES wda PATHS ENV LIBWDA_LIB)
-cet_find_library(SQLITE NAMES sqlite3_ups PATHS ENV SQLITE_LIB)
+#cet_find_library(SQLITE NAMES sqlite3_ups PATHS ENV SQLITE_LIB)
+find_library(SQLITE3 NAMES sqlite3 REQUIRED PATHS ENV SQLITE_LIB)
 
 include_directories($ENV{LIBWDA_FQ_DIR}/include)
 
