@@ -1,5 +1,6 @@
-cet_find_library(LIBWDA NAMES wda PATHS ENV LIBWDA_LIB NO_DEFAULT_PATH)
-cet_find_library(SQLITE NAMES sqlite3_ups PATHS ENV SQLITE_LIB NO_DEFAULT_PATH)
+cet_find_library(LIBWDA NAMES wda PATHS ENV LIBWDA_LIB)
+#cet_find_library(SQLITE NAMES sqlite3_ups PATHS ENV SQLITE_LIB)
+find_library(SQLITE NAMES sqlite3 REQUIRED PATHS ENV SQLITE_LIB)
 
 include_directories($ENV{LIBWDA_FQ_DIR}/include)
 
@@ -7,15 +8,15 @@ art_make(LIB_LIBRARIES
            larevt_CalibrationDBI_IOVData
            ${LIBWDA}
            ${SQLITE}
-           ${MF_MESSAGELOGGER}
-           ${FHICLCPP}
+           messagefacility::MF_MessageLogger
+           fhiclcpp::fhiclcpp fhiclcpp::types
            canvas
            cetlib
            cetlib_except
            larcorealg_Geometry
-           ${ART_FRAMEWORK_SERVICES_REGISTRY}
+           art::Framework_Services_Registry
            ROOT::Core
-           ${ART_UTILITIES}
+           art::Utilities
         )
 
 install_headers()

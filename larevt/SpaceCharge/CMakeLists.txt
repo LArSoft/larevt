@@ -1,7 +1,7 @@
 art_make(NO_PLUGINS
          LIB_LIBRARIES
            canvas
-           ${FHICLCPP}
+           fhiclcpp::fhiclcpp fhiclcpp::types
            ROOT::Core
            ROOT::Hist
            ROOT::RIO

@@ -6,14 +6,13 @@
 #  buildtool [-I /install/path] -bt[i] -jN
 # ======================================================================
 
-cmake_minimum_required (VERSION 3.12...3.18 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
 
-project(larevt LANGUAGES CXX)
+project(larevt VERSION 09.02.06 LANGUAGES CXX)
 
-# cetbuildtools contains our cmake modules
-find_package(cetbuildtools REQUIRED)
-
-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules $ENV{ART_DIR}/Modules)
+find_package(cetmodules REQUIRED)
+find_package(canvas_root_io)
+find_package(art)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -38,7 +37,7 @@ find_ups_product( art )
 find_ups_product(art_root_io)
 find_ups_product( messagefacility )
 find_ups_root()
-find_ups_product( postgresql )
+find_package( postgresql )
 find_ups_product( libwda )
 
 # macros for dictionary and simple_plugin
@@ -51,9 +50,11 @@ add_subdirectory(larevt)
 
 # tests
 add_subdirectory(test)
-
+add_subdirectory(cmakeConfig)
 # ups - table and config files
+if(WANT_UPS)
 add_subdirectory(ups)
+endif()
 
 # packaging utility
-include(UseCPack)
+#include(UseCPack)

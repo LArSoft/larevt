@@ -1,0 +1,3 @@
+find_package( PostgreSQL REQUIRED )
+find_package( ROOT REQUIRED COMPONENTS FFTW )
+find_package( lardata REQUIRED )

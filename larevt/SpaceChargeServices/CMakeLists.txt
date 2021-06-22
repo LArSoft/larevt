@@ -1,6 +1,6 @@
 simple_plugin(SpaceChargeServiceStandard "service"
               larevt_SpaceCharge
-              ${ART_FRAMEWORK_PRINCIPAL}
+              art::Framework_Principal
               ROOT::Core
             )
 
