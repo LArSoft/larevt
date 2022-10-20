@@ -65,62 +65,50 @@ namespace lariov {
    */
   class ChannelStatusService {
 
-    public:
+  public:
+    using provider_type = ChannelStatusProvider;
 
-      using provider_type = ChannelStatusProvider;
+    /// Destructor
+    virtual ~ChannelStatusService() = default;
 
-      /// Destructor
-      virtual ~ChannelStatusService() = default;
+    //
+    // Actual interface here
+    //
 
-      //
-      // Actual interface here
-      //
+    //@{
+    /// Returns a reference to the service provider
+    ChannelStatusProvider const& GetProvider() const { return DoGetProvider(); }
+    // will be deprecated:
+    ChannelStatusProvider const& GetFilter() const { return GetProvider(); }
+    //@}
 
-      //@{
-      /// Returns a reference to the service provider
-      ChannelStatusProvider const& GetProvider() const
-        { return DoGetProvider(); }
-      // will be deprecated:
-      ChannelStatusProvider const& GetFilter() const { return GetProvider(); }
-      //@}
+    //@{
+    /// Returns a pointer to the service provider
+    ChannelStatusProvider const* GetProviderPtr() const { return DoGetProviderPtr(); }
+    // will be deprecated:
+    ChannelStatusProvider const* GetFilterPtr() const { return GetProviderPtr(); }
+    //@}
 
-      //@{
-      /// Returns a pointer to the service provider
-      ChannelStatusProvider const* GetProviderPtr() const
-        { return DoGetProviderPtr(); }
-      // will be deprecated:
-      ChannelStatusProvider const* GetFilterPtr() const
-        { return GetProviderPtr(); }
-      //@}
+    ChannelStatusProvider const* provider() const { return GetProviderPtr(); }
 
+    //
+    // end of interface
+    //
 
-      ChannelStatusProvider const* provider() const
-        { return GetProviderPtr(); }
+  private:
+    /// Returns a pointer to the service provider
+    virtual ChannelStatusProvider const* DoGetProviderPtr() const = 0;
 
-      //
-      // end of interface
-      //
-
-    private:
-
-      /// Returns a pointer to the service provider
-      virtual ChannelStatusProvider const* DoGetProviderPtr() const = 0;
-
-      /// Returns a reference to the service provider
-      virtual ChannelStatusProvider const& DoGetProvider() const = 0;
-
-
+    /// Returns a reference to the service provider
+    virtual ChannelStatusProvider const& DoGetProvider() const = 0;
 
   }; // class ChannelStatusService
 
 } // namespace lariov
 
-
 DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, SHARED)
-
 
 // check that the requirements for lariov::ChannelStatusService are satisfied
 template struct lar::details::ServiceRequirementsChecker<lariov::ChannelStatusService>;
-
 
 #endif // CHANNELSTATUSSERVICE_H

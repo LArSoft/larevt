@@ -9,7 +9,7 @@ namespace lariov {
   class DetPedestalProvider;
 }
 
-namespace lariov{
+namespace lariov {
 
   /**
      \class DetPedestalService
@@ -17,27 +17,21 @@ namespace lariov{
   */
   class DetPedestalService {
 
-    public:
-      using provider_type = DetPedestalProvider;
+  public:
+    using provider_type = DetPedestalProvider;
 
-      virtual ~DetPedestalService() = default;
+    virtual ~DetPedestalService() = default;
 
-      //retrieve pedestal provider
-      const DetPedestalProvider& GetPedestalProvider() const {
-        return this->DoGetPedestalProvider();
-      }
+    //retrieve pedestal provider
+    const DetPedestalProvider& GetPedestalProvider() const { return this->DoGetPedestalProvider(); }
 
-      DetPedestalProvider const* provider() const
-        { return &DoGetPedestalProvider(); }
+    DetPedestalProvider const* provider() const { return &DoGetPedestalProvider(); }
 
-
-    private:
-
-      virtual const DetPedestalProvider& DoGetPedestalProvider() const = 0;
+  private:
+    virtual const DetPedestalProvider& DoGetPedestalProvider() const = 0;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 DECLARE_ART_SERVICE_INTERFACE(lariov::DetPedestalService, SHARED)
-
 
 #endif

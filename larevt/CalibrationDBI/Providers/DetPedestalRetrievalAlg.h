@@ -19,15 +19,17 @@
 
 // LArSoft libraries
 #include "larevt/CalibrationDBI/IOVData/DetPedestal.h"
-#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 
 class SIOVDetPedestalService;
 
-namespace fhicl { class ParameterSet; }
+namespace fhicl {
+  class ParameterSet;
+}
 
 namespace lariov {
 
@@ -59,60 +61,64 @@ namespace lariov {
 
     friend class SIOVDetPedestalService;
 
-    public:
+  public:
+    /// Constructors
+    DetPedestalRetrievalAlg(const std::string& foldername,
+                            const std::string& url,
+                            const std::string& tag = "");
 
-      /// Constructors
-      DetPedestalRetrievalAlg(const std::string& foldername,
-      			      const std::string& url,
-			      const std::string& tag="");
+    DetPedestalRetrievalAlg(fhicl::ParameterSet const& p);
 
-      DetPedestalRetrievalAlg(fhicl::ParameterSet const& p);
+    /// Reconfigure function called by fhicl constructor
+    void Reconfigure(fhicl::ParameterSet const& p) override;
 
-      /// Reconfigure function called by fhicl constructor
-      void Reconfigure(fhicl::ParameterSet const& p) override;
+    /* /// Update event time stamp. */
+    /* void UpdateTimeStamp(DBTimeStamp_t ts); */
 
-      /* /// Update event time stamp. */
-      /* void UpdateTimeStamp(DBTimeStamp_t ts); */
+    /* /// Update Snapshot and inherited DBFolder if using database.  Return true if updated */
+    /* bool Update(DBTimeStamp_t ts); */
 
-      /* /// Update Snapshot and inherited DBFolder if using database.  Return true if updated */
-      /* bool Update(DBTimeStamp_t ts); */
+    /// Retrieve pedestal information
+    const DetPedestal& Pedestal(DBChannelID_t ch) const;
+    float PedMean(DBChannelID_t ch) const override;
+    float PedRms(DBChannelID_t ch) const override;
+    float PedMeanErr(DBChannelID_t ch) const override;
+    float PedRmsErr(DBChannelID_t ch) const override;
 
-      /// Retrieve pedestal information
-      const DetPedestal& Pedestal(DBChannelID_t ch) const;
-      float PedMean(DBChannelID_t ch) const override;
-      float PedRms(DBChannelID_t ch) const override;
-      float PedMeanErr(DBChannelID_t ch) const override;
-      float PedRmsErr(DBChannelID_t ch) const override;
+    //hardcoded information about database folder - useful for debugging cross checks
+    static constexpr unsigned int NCOLUMNS = 5;
+    static constexpr const char* FIELD_NAMES[NCOLUMNS] = {"channel",
+                                                          "mean",
+                                                          "mean_err",
+                                                          "rms",
+                                                          "rms_err"};
+    static constexpr const char* FIELD_TYPES[NCOLUMNS] = {"unsigned int",
+                                                          "float",
+                                                          "float",
+                                                          "float",
+                                                          "float"};
 
-      //hardcoded information about database folder - useful for debugging cross checks
-      static constexpr unsigned int NCOLUMNS = 5;
-      static constexpr const char* FIELD_NAMES[NCOLUMNS]
-        = {"channel", "mean", "mean_err", "rms", "rms_err"};
-      static constexpr const char* FIELD_TYPES[NCOLUMNS]
-        = {"unsigned int", "float", "float", "float", "float"};
+  private:
+    /// Update event time stamp.
+    void UpdateTimeStamp(DBTimeStamp_t ts);
 
-    private:
+    /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
+    bool Update(DBTimeStamp_t ts);
 
-      /// Update event time stamp.
-      void UpdateTimeStamp(DBTimeStamp_t ts);
+    /// Do actual database updates.
 
-      /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(DBTimeStamp_t ts);
+    bool DBUpdate() const; // Uses current event time.
+    bool DBUpdate(DBTimeStamp_t ts) const;
 
-      /// Do actual database updates.
+    // Time stamps.
 
-      bool DBUpdate() const;                    // Uses current event time.
-      bool DBUpdate(DBTimeStamp_t ts) const;
+    DBTimeStamp_t fEventTimeStamp;           // Most recently seen time stamp.
+    mutable DBTimeStamp_t fCurrentTimeStamp; // Time stamp of cached data.
 
-      // Time stamps.
-
-      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
-      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
-
-      DataSource::ds fDataSource;
-      mutable Snapshot<DetPedestal> fData;
+    DataSource::ds fDataSource;
+    mutable Snapshot<DetPedestal> fData;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif
- /** @} */ // end of doxygen group
+/** @} */ // end of doxygen group

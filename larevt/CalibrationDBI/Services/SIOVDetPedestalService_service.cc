@@ -1,13 +1,13 @@
+#include "art/Framework/Principal/Event.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
-#include "art/Framework/Principal/Event.h"
 #include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "larcore/CoreUtils/EnsureOnlyOneSchedule.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Providers/DetPedestalRetrievalAlg.h"
-#include "larcore/CoreUtils/EnsureOnlyOneSchedule.h"
 
-namespace lariov{
+namespace lariov {
 
   /**
      \class SIOVDetPedestalService
@@ -15,41 +15,41 @@ namespace lariov{
      a detector pedestal retrieval service for database scheme in which
      all elements in a database folder share a common interval of validity
   */
-  class SIOVDetPedestalService : public DetPedestalService, private lar::EnsureOnlyOneSchedule<SIOVDetPedestalService> {
+  class SIOVDetPedestalService : public DetPedestalService,
+                                 private lar::EnsureOnlyOneSchedule<SIOVDetPedestalService> {
 
-    public:
+  public:
+    SIOVDetPedestalService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
+    ~SIOVDetPedestalService() {}
 
-      SIOVDetPedestalService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
-      ~SIOVDetPedestalService(){}
+    void PreProcessEvent(const art::Event& evt, art::ScheduleContext)
+    {
+      //fProvider.UpdateTimeStamp(evt.time().value());
+      fProvider.Update(evt.time().value());
+    }
 
-      void PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
-        //fProvider.UpdateTimeStamp(evt.time().value());
-        fProvider.Update(evt.time().value());
-      }
+  private:
+    const DetPedestalProvider& DoGetPedestalProvider() const override { return fProvider; }
 
-    private:
-
-      const DetPedestalProvider& DoGetPedestalProvider() const override {
-        return fProvider;
-      }
-
-      DetPedestalRetrievalAlg fProvider;
+    DetPedestalRetrievalAlg fProvider;
   };
-}//end namespace lariov
+} //end namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPedestalService, SHARED)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService,
+                                   lariov::DetPedestalService,
+                                   SHARED)
 
+namespace lariov {
 
-namespace lariov{
-
-  SIOVDetPedestalService::SIOVDetPedestalService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg)
-  : fProvider(pset.get<fhicl::ParameterSet>("DetPedestalRetrievalAlg"))
+  SIOVDetPedestalService::SIOVDetPedestalService(fhicl::ParameterSet const& pset,
+                                                 art::ActivityRegistry& reg)
+    : fProvider(pset.get<fhicl::ParameterSet>("DetPedestalRetrievalAlg"))
   {
     //register callback to update local database cache before each event is processed
     //reg.sPreProcessEvent.watch(&SIOVDetPedestalService::PreProcessEvent, *this);
     reg.sPreProcessEvent.watch(this, &SIOVDetPedestalService::PreProcessEvent);
   }
 
-}//end namespace lariov
+} //end namespace lariov
 
 DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPedestalService)
