@@ -8,12 +8,11 @@ namespace lariov {
 
   class TimeStampDecoder {
 
-    public:
+  public:
+    TimeStampDecoder() {}
+    virtual ~TimeStampDecoder();
 
-      TimeStampDecoder() {}
-      virtual ~TimeStampDecoder();
-
-      static IOVTimeStamp DecodeTimeStamp(DBTimeStamp_t ts);
+    static IOVTimeStamp DecodeTimeStamp(DBTimeStamp_t ts);
   };
 }
 

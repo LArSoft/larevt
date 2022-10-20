@@ -14,19 +14,18 @@
 #ifndef IOVDATA_IOVDATAERROR_H
 #define IOVDATA_IOVDATAERROR_H
 
-#include <iostream>
 #include <exception>
+#include <iostream>
 
 namespace lariov {
 
   /**
      \class IOVDataError
   */
-  class IOVDataError : public std::exception{
+  class IOVDataError : public std::exception {
 
   public:
-
-    IOVDataError(std::string msg="") : std::exception()
+    IOVDataError(std::string msg = "") : std::exception()
     {
       fMsg = "\033[93m";
       fMsg += msg;
@@ -34,8 +33,7 @@ namespace lariov {
     }
 
     virtual ~IOVDataError() throw(){};
-    virtual const char* what() const throw()
-    { return fMsg.c_str(); }
+    virtual const char* what() const throw() { return fMsg.c_str(); }
 
   private:
     std::string fMsg;
@@ -45,4 +43,3 @@ namespace lariov {
 
 #endif
 /** @} */ // end of doxygen group
-

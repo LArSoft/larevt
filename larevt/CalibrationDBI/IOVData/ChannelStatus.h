@@ -18,51 +18,52 @@
 
 namespace lariov {
 
-  enum chStatus {kDISCONNECTED=0, kDEAD=1, kLOWNOISE=2, kNOISY=3, kGOOD=4, kUNKNOWN=5};
+  enum chStatus {
+    kDISCONNECTED = 0,
+    kDEAD = 1,
+    kLOWNOISE = 2,
+    kNOISY = 3,
+    kGOOD = 4,
+    kUNKNOWN = 5
+  };
 
   /**
      \class ChannelStatus
   */
   class ChannelStatus : public ChData {
 
-    public:
+  public:
+    /// Constructor
+    ChannelStatus(unsigned int ch) : ChData(ch) {}
 
-      /// Constructor
-      ChannelStatus(unsigned int ch) : ChData(ch) {}
+    /// Default destructor
+    ~ChannelStatus() = default;
 
-      /// Default destructor
-      ~ChannelStatus() = default;
+    bool IsDead() const { return fStatus == kDEAD ? true : false; }
+    bool IsLowNoise() const { return fStatus == kLOWNOISE ? true : false; }
+    bool IsNoisy() const { return fStatus == kNOISY ? true : false; }
+    bool IsPresent() const { return fStatus == kDISCONNECTED ? false : true; }
+    bool IsGood() const { return fStatus == kGOOD ? true : false; }
+    chStatus Status() const { return fStatus; }
 
-      bool IsDead()      const { return fStatus == kDEAD         ? true : false; }
-      bool IsLowNoise()  const { return fStatus == kLOWNOISE     ? true : false; }
-      bool IsNoisy()     const { return fStatus == kNOISY        ? true : false; }
-      bool IsPresent()   const { return fStatus == kDISCONNECTED ? false : true; }
-      bool IsGood()      const { return fStatus == kGOOD         ? true : false; }
-      chStatus Status()  const { return fStatus; }
+    void SetStatus(chStatus status) { fStatus = status; }
 
-      void SetStatus(chStatus status) { fStatus = status; }
+    static chStatus GetStatusFromInt(int status)
+    {
+      switch (status) {
+      case kDISCONNECTED: return kDISCONNECTED; break;
+      case kDEAD: return kDEAD; break;
+      case kLOWNOISE: return kLOWNOISE; break;
+      case kNOISY: return kNOISY; break;
+      case kGOOD: return kGOOD; break;
+      default: return kUNKNOWN;
+      };
 
-      static chStatus GetStatusFromInt(int status) {
-	switch(status)
-	{
-	  case kDISCONNECTED : return kDISCONNECTED;
-	                       break;
-	  case kDEAD         : return kDEAD;
-	                       break;
-	  case kLOWNOISE     : return kLOWNOISE;
-	                       break;
-	  case kNOISY        : return kNOISY;
-	                       break;
-	  case kGOOD         : return kGOOD;
-	                       break;
-	  default            : return kUNKNOWN;
-	};
+      return kUNKNOWN;
+    }
 
-	return kUNKNOWN;
-      }
-
-    private:
-      chStatus fStatus;
+  private:
+    chStatus fStatus;
   }; //end class
 } //end namespace lariov
 

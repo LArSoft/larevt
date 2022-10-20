@@ -23,56 +23,55 @@ namespace lariov {
 
   class IOVTimeStamp {
 
-    public:
+  public:
+    ///Constructor
+    IOVTimeStamp(unsigned long stamp, unsigned int substamp = 0)
+      : fStamp(stamp), fSubStamp(substamp)
+    {
+      this->CalcDBStamp();
+    }
 
-      ///Constructor
-      IOVTimeStamp(unsigned long stamp, unsigned int substamp = 0) :
-        fStamp(stamp), fSubStamp(substamp) {
-	this->CalcDBStamp();
-      }
+    ///Default destructor
+    virtual ~IOVTimeStamp() {}
 
-      ///Default destructor
-      virtual ~IOVTimeStamp(){}
+    unsigned long Stamp() const { return fStamp; }
+    unsigned long SubStamp() const { return fSubStamp; }
+    const std::string& DBStamp() const { return fDBStamp; }
 
-      unsigned long Stamp() const { return fStamp; }
-      unsigned long SubStamp() const { return fSubStamp; }
-      const std::string& DBStamp() const { return fDBStamp; }
+    void SetStamp(unsigned long stamp, unsigned int substamp = 0)
+    {
+      fStamp = stamp;
+      fSubStamp = substamp;
+      this->CalcDBStamp();
+    }
 
-      void SetStamp(unsigned long stamp, unsigned int substamp = 0) {fStamp = stamp; fSubStamp = substamp; this->CalcDBStamp();}
-
-
-      /**
+    /**
         This function combines the stamp and substamp into a unique string to be used
 	as a database timestamp.
       */
-      void CalcDBStamp();
+    void CalcDBStamp();
 
-      static IOVTimeStamp GetFromString(const std::string& ts);
-      static IOVTimeStamp MinTimeStamp();
-      static IOVTimeStamp MaxTimeStamp();
+    static IOVTimeStamp GetFromString(const std::string& ts);
+    static IOVTimeStamp MinTimeStamp();
+    static IOVTimeStamp MaxTimeStamp();
 
+    ///comparison operators
+    bool operator<(const IOVTimeStamp& ts) const;
+    bool operator<=(const IOVTimeStamp& ts) const;
+    bool operator>=(const IOVTimeStamp& ts) const;
+    bool operator>(const IOVTimeStamp& ts) const;
 
-      ///comparison operators
-      bool operator<(const IOVTimeStamp& ts) const;
-      bool operator<=(const IOVTimeStamp& ts) const;
-      bool operator>=(const IOVTimeStamp& ts) const;
-      bool operator>(const IOVTimeStamp& ts) const;
+    bool operator==(const IOVTimeStamp& ts) const;
+    bool operator!=(const IOVTimeStamp& ts) const;
 
-      bool operator==(const IOVTimeStamp& ts) const;
-      bool operator!=(const IOVTimeStamp& ts) const;
+    ///assignment operator
+    IOVTimeStamp& operator=(const IOVTimeStamp& ts);
 
-      ///assignment operator
-      IOVTimeStamp& operator=( const IOVTimeStamp& ts);
+  protected:
+    unsigned long fStamp;
+    unsigned int fSubStamp;
 
-
-    protected:
-
-      unsigned long fStamp;
-      unsigned int fSubStamp;
-
-      std::string fDBStamp;
+    std::string fDBStamp;
   };
 }
 #endif
-
-

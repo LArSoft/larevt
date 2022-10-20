@@ -23,9 +23,7 @@
 #include "TString.h"
 
 //-----------------------------------------------
-spacecharge::SpaceChargeStandard::SpaceChargeStandard(
-  fhicl::ParameterSet const& pset
-)
+spacecharge::SpaceChargeStandard::SpaceChargeStandard(fhicl::ParameterSet const& pset)
 {
   Configure(pset);
 }
@@ -42,60 +40,60 @@ bool spacecharge::SpaceChargeStandard::Configure(fhicl::ParameterSet const& pset
   // check that the old obsoleted parameter is not in configuration:
   if (pset.has_key("EnableSimulationSCE")) {
     throw art::Exception(art::errors::Configuration)
-      << "Configuration parameter 'EnableSimulationSCE' has been replaced by 'EnableSimSpatialSCE'.\n";
+      << "Configuration parameter 'EnableSimulationSCE' has been replaced by "
+         "'EnableSimSpatialSCE'.\n";
   }
 
-  if((fEnableSimSpatialSCE == true) | (fEnableSimEfieldSCE == true))
-  {
+  if ((fEnableSimSpatialSCE == true) | (fEnableSimEfieldSCE == true)) {
     fRepresentationType = pset.get<std::string>("RepresentationType");
     fInputFilename = pset.get<std::string>("InputFilename");
 
     std::string fname;
     cet::search_path sp("FW_SEARCH_PATH");
-    sp.find_file(fInputFilename,fname);
+    sp.find_file(fInputFilename, fname);
 
     auto infile = std::make_unique<TFile>(fname.c_str(), "READ");
-    if(!infile->IsOpen()) throw art::Exception(art::errors::Configuration) << "Could not find the space charge effect file '" << fname << "'!\n";
+    if (!infile->IsOpen())
+      throw art::Exception(art::errors::Configuration)
+        << "Could not find the space charge effect file '" << fname << "'!\n";
 
-    if(fRepresentationType == "Parametric")
-    {
-      for(int i = 0; i < 5; i++)
-      {
-        g1_x[i] = (TGraph*)infile->Get(Form("deltaX/g1_%d",i));
-        g2_x[i] = (TGraph*)infile->Get(Form("deltaX/g2_%d",i));
-        g3_x[i] = (TGraph*)infile->Get(Form("deltaX/g3_%d",i));
-        g4_x[i] = (TGraph*)infile->Get(Form("deltaX/g4_%d",i));
-        g5_x[i] = (TGraph*)infile->Get(Form("deltaX/g5_%d",i));
+    if (fRepresentationType == "Parametric") {
+      for (int i = 0; i < 5; i++) {
+        g1_x[i] = (TGraph*)infile->Get(Form("deltaX/g1_%d", i));
+        g2_x[i] = (TGraph*)infile->Get(Form("deltaX/g2_%d", i));
+        g3_x[i] = (TGraph*)infile->Get(Form("deltaX/g3_%d", i));
+        g4_x[i] = (TGraph*)infile->Get(Form("deltaX/g4_%d", i));
+        g5_x[i] = (TGraph*)infile->Get(Form("deltaX/g5_%d", i));
 
-        g1_y[i] = (TGraph*)infile->Get(Form("deltaY/g1_%d",i));
-        g2_y[i] = (TGraph*)infile->Get(Form("deltaY/g2_%d",i));
-        g3_y[i] = (TGraph*)infile->Get(Form("deltaY/g3_%d",i));
-        g4_y[i] = (TGraph*)infile->Get(Form("deltaY/g4_%d",i));
-        g5_y[i] = (TGraph*)infile->Get(Form("deltaY/g5_%d",i));
-        g6_y[i] = (TGraph*)infile->Get(Form("deltaY/g6_%d",i));
+        g1_y[i] = (TGraph*)infile->Get(Form("deltaY/g1_%d", i));
+        g2_y[i] = (TGraph*)infile->Get(Form("deltaY/g2_%d", i));
+        g3_y[i] = (TGraph*)infile->Get(Form("deltaY/g3_%d", i));
+        g4_y[i] = (TGraph*)infile->Get(Form("deltaY/g4_%d", i));
+        g5_y[i] = (TGraph*)infile->Get(Form("deltaY/g5_%d", i));
+        g6_y[i] = (TGraph*)infile->Get(Form("deltaY/g6_%d", i));
 
-        g1_z[i] = (TGraph*)infile->Get(Form("deltaZ/g1_%d",i));
-        g2_z[i] = (TGraph*)infile->Get(Form("deltaZ/g2_%d",i));
-        g3_z[i] = (TGraph*)infile->Get(Form("deltaZ/g3_%d",i));
-        g4_z[i] = (TGraph*)infile->Get(Form("deltaZ/g4_%d",i));
+        g1_z[i] = (TGraph*)infile->Get(Form("deltaZ/g1_%d", i));
+        g2_z[i] = (TGraph*)infile->Get(Form("deltaZ/g2_%d", i));
+        g3_z[i] = (TGraph*)infile->Get(Form("deltaZ/g3_%d", i));
+        g4_z[i] = (TGraph*)infile->Get(Form("deltaZ/g4_%d", i));
 
-	g1_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g1_%d",i));
-	g2_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g2_%d",i));
-	g3_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g3_%d",i));
-	g4_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g4_%d",i));
-	g5_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g5_%d",i));
+        g1_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g1_%d", i));
+        g2_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g2_%d", i));
+        g3_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g3_%d", i));
+        g4_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g4_%d", i));
+        g5_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g5_%d", i));
 
-	g1_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g1_%d",i));
-	g2_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g2_%d",i));
-	g3_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g3_%d",i));
-	g4_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g4_%d",i));
-	g5_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g5_%d",i));
-	g6_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g6_%d",i));
+        g1_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g1_%d", i));
+        g2_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g2_%d", i));
+        g3_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g3_%d", i));
+        g4_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g4_%d", i));
+        g5_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g5_%d", i));
+        g6_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g6_%d", i));
 
-	g1_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g1_%d",i));
-	g2_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g2_%d",i));
-	g3_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g3_%d",i));
-	g4_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g4_%d",i));
+        g1_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g1_%d", i));
+        g2_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g2_%d", i));
+        g3_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g3_%d", i));
+        g4_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g4_%d", i));
       }
 
       g1_x[5] = (TGraph*)infile->Get("deltaX/g1_5");
@@ -140,8 +138,7 @@ bool spacecharge::SpaceChargeStandard::Configure(fhicl::ParameterSet const& pset
     infile->Close();
   }
 
-  if(fEnableCorrSCE == true)
-  {
+  if (fEnableCorrSCE == true) {
     // Grab other parameters from pset
   }
 
@@ -198,30 +195,31 @@ geo::Vector_t spacecharge::SpaceChargeStandard::GetPosOffsets(geo::Point_t const
 {
   std::vector<double> thePosOffsets;
 
-  if(IsInsideBoundaries(point.X(), point.Y(), point.Z()) == false)
-  {
-    thePosOffsets.resize(3,0.0);
+  if (IsInsideBoundaries(point.X(), point.Y(), point.Z()) == false) {
+    thePosOffsets.resize(3, 0.0);
   }
-  else
-  {
-    if(fRepresentationType == "Parametric")
+  else {
+    if (fRepresentationType == "Parametric")
       thePosOffsets = GetPosOffsetsParametric(point.X(), point.Y(), point.Z());
     else
-      thePosOffsets.resize(3,0.0);
+      thePosOffsets.resize(3, 0.0);
   }
 
-  return { thePosOffsets[0], thePosOffsets[1], thePosOffsets[2] };
+  return {thePosOffsets[0], thePosOffsets[1], thePosOffsets[2]};
 }
 
-geo::Vector_t spacecharge::SpaceChargeStandard::GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const
+geo::Vector_t spacecharge::SpaceChargeStandard::GetCalPosOffsets(geo::Point_t const& point,
+                                                                 int const& TPCid) const
 {
 
-	return{ 0., 0., 0.};
+  return {0., 0., 0.};
 }
 
 //----------------------------------------------------------------------------
 /// Provides position offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeStandard::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> spacecharge::SpaceChargeStandard::GetPosOffsetsParametric(double xVal,
+                                                                              double yVal,
+                                                                              double zVal) const
 {
   std::vector<double> thePosOffsetsParametric;
 
@@ -229,9 +227,9 @@ std::vector<double> spacecharge::SpaceChargeStandard::GetPosOffsetsParametric(do
   double yValNew = TransformY(yVal);
   double zValNew = TransformZ(zVal);
 
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"X"));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"Y"));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"Z"));
+  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew, yValNew, zValNew, "X"));
+  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew, yValNew, zValNew, "Y"));
+  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew, yValNew, zValNew, "Z"));
 
   return thePosOffsetsParametric;
 }
@@ -239,23 +237,23 @@ std::vector<double> spacecharge::SpaceChargeStandard::GetPosOffsetsParametric(do
 //----------------------------------------------------------------------------
 /// Provides one position offset using a parametric representation, for a given
 /// axis
-double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNew,
+                                                                   double yValNew,
+                                                                   double zValNew,
+                                                                   std::string axis) const
 {
   double parA[6][7];
   double parB[6];
 
-  for(int j = 0; j < 6; j++)
-  {
-    for(int i = 0; i < 7; i++)
+  for (int j = 0; j < 6; j++) {
+    for (int i = 0; i < 7; i++)
       parA[j][i] = 0.0;
 
     parB[j] = 0.0;
   }
 
-  if(axis == "X")
-  {
-    for(int j = 0; j < 7; j++)
-    {
+  if (axis == "X") {
+    for (int j = 0; j < 7; j++) {
       parA[0][j] = g1_x[j]->Eval(zValNew);
       parA[1][j] = g2_x[j]->Eval(zValNew);
       parA[2][j] = g3_x[j]->Eval(zValNew);
@@ -269,10 +267,8 @@ double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNe
     f4_x->SetParameters(parA[3]);
     f5_x->SetParameters(parA[4]);
   }
-  else if(axis == "Y")
-  {
-    for(int j = 0; j < 6; j++)
-    {
+  else if (axis == "Y") {
+    for (int j = 0; j < 6; j++) {
       parA[0][j] = g1_y[j]->Eval(zValNew);
       parA[1][j] = g2_y[j]->Eval(zValNew);
       parA[2][j] = g3_y[j]->Eval(zValNew);
@@ -288,10 +284,8 @@ double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNe
     f5_y->SetParameters(parA[4]);
     f6_y->SetParameters(parA[5]);
   }
-  else if(axis == "Z")
-  {
-    for(int j = 0; j < 5; j++)
-    {
+  else if (axis == "Z") {
+    for (int j = 0; j < 5; j++) {
       parA[0][j] = g1_z[j]->Eval(zValNew);
       parA[1][j] = g2_z[j]->Eval(zValNew);
       parA[2][j] = g3_z[j]->Eval(zValNew);
@@ -307,20 +301,17 @@ double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNe
   double aValNew;
   double bValNew;
 
-  if(axis == "Y")
-  {
+  if (axis == "Y") {
     aValNew = xValNew;
     bValNew = yValNew;
   }
-  else
-  {
+  else {
     aValNew = yValNew;
     bValNew = xValNew;
   }
 
   double offsetValNew = 0.0;
-  if(axis == "X")
-  {
+  if (axis == "X") {
     parB[0] = f1_x->Eval(aValNew);
     parB[1] = f2_x->Eval(aValNew);
     parB[2] = f3_x->Eval(aValNew);
@@ -328,10 +319,9 @@ double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNe
     parB[4] = f5_x->Eval(aValNew);
 
     fFinal_x->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_x->Eval(bValNew);
+    offsetValNew = 100.0 * fFinal_x->Eval(bValNew);
   }
-  else if(axis == "Y")
-  {
+  else if (axis == "Y") {
     parB[0] = f1_y->Eval(aValNew);
     parB[1] = f2_y->Eval(aValNew);
     parB[2] = f3_y->Eval(aValNew);
@@ -340,17 +330,16 @@ double spacecharge::SpaceChargeStandard::GetOnePosOffsetParametric(double xValNe
     parB[5] = f6_y->Eval(aValNew);
 
     fFinal_y->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_y->Eval(bValNew);
+    offsetValNew = 100.0 * fFinal_y->Eval(bValNew);
   }
-  else if(axis == "Z")
-  {
+  else if (axis == "Z") {
     parB[0] = f1_z->Eval(aValNew);
     parB[1] = f2_z->Eval(aValNew);
     parB[2] = f3_z->Eval(aValNew);
     parB[3] = f4_z->Eval(aValNew);
 
     fFinal_z->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_z->Eval(bValNew);
+    offsetValNew = 100.0 * fFinal_z->Eval(bValNew);
   }
 
   return offsetValNew;
@@ -363,23 +352,26 @@ geo::Vector_t spacecharge::SpaceChargeStandard::GetEfieldOffsets(geo::Point_t co
 {
   std::vector<double> theEfieldOffsets;
 
-  if(fRepresentationType == "Parametric")
+  if (fRepresentationType == "Parametric")
     theEfieldOffsets = GetEfieldOffsetsParametric(point.X(), point.Y(), point.Z());
   else
-    theEfieldOffsets.resize(3,0.0);
+    theEfieldOffsets.resize(3, 0.0);
 
-  return { -theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2] };
+  return {-theEfieldOffsets[0], -theEfieldOffsets[1], -theEfieldOffsets[2]};
 }
 
-geo::Vector_t spacecharge::SpaceChargeStandard::GetCalEfieldOffsets(geo::Point_t const& point, int const& TPCid) const
+geo::Vector_t spacecharge::SpaceChargeStandard::GetCalEfieldOffsets(geo::Point_t const& point,
+                                                                    int const& TPCid) const
 {
 
-	return {0., 0., 0.};
+  return {0., 0., 0.};
 }
 
 //----------------------------------------------------------------------------
 /// Provides E field offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeStandard::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> spacecharge::SpaceChargeStandard::GetEfieldOffsetsParametric(double xVal,
+                                                                                 double yVal,
+                                                                                 double zVal) const
 {
   std::vector<double> theEfieldOffsetsParametric;
 
@@ -387,9 +379,12 @@ std::vector<double> spacecharge::SpaceChargeStandard::GetEfieldOffsetsParametric
   double yValNew = TransformY(yVal);
   double zValNew = TransformZ(zVal);
 
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"X"));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"Y"));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"Z"));
+  theEfieldOffsetsParametric.push_back(
+    GetOneEfieldOffsetParametric(xValNew, yValNew, zValNew, "X"));
+  theEfieldOffsetsParametric.push_back(
+    GetOneEfieldOffsetParametric(xValNew, yValNew, zValNew, "Y"));
+  theEfieldOffsetsParametric.push_back(
+    GetOneEfieldOffsetParametric(xValNew, yValNew, zValNew, "Z"));
 
   return theEfieldOffsetsParametric;
 }
@@ -397,23 +392,23 @@ std::vector<double> spacecharge::SpaceChargeStandard::GetEfieldOffsetsParametric
 //----------------------------------------------------------------------------
 /// Provides one E field offset using a parametric representation, for a given
 /// axis, with returned E field offsets normalized to nominal drift E field
-double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xValNew,
+                                                                      double yValNew,
+                                                                      double zValNew,
+                                                                      std::string axis) const
 {
   double parA[6][7];
   double parB[6];
 
-  for(int j = 0; j < 6; j++)
-  {
-    for(int i = 0; i < 7; i++)
+  for (int j = 0; j < 6; j++) {
+    for (int i = 0; i < 7; i++)
       parA[j][i] = 0.0;
 
     parB[j] = 0.0;
   }
 
-  if(axis == "X")
-  {
-    for(int j = 0; j < 7; j++)
-    {
+  if (axis == "X") {
+    for (int j = 0; j < 7; j++) {
       parA[0][j] = g1_Ex[j]->Eval(zValNew);
       parA[1][j] = g2_Ex[j]->Eval(zValNew);
       parA[2][j] = g3_Ex[j]->Eval(zValNew);
@@ -427,10 +422,8 @@ double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xVa
     f4_Ex->SetParameters(parA[3]);
     f5_Ex->SetParameters(parA[4]);
   }
-  else if(axis == "Y")
-  {
-    for(int j = 0; j < 6; j++)
-    {
+  else if (axis == "Y") {
+    for (int j = 0; j < 6; j++) {
       parA[0][j] = g1_Ey[j]->Eval(zValNew);
       parA[1][j] = g2_Ey[j]->Eval(zValNew);
       parA[2][j] = g3_Ey[j]->Eval(zValNew);
@@ -446,10 +439,8 @@ double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xVa
     f5_Ey->SetParameters(parA[4]);
     f6_Ey->SetParameters(parA[5]);
   }
-  else if(axis == "Z")
-  {
-    for(int j = 0; j < 5; j++)
-    {
+  else if (axis == "Z") {
+    for (int j = 0; j < 5; j++) {
       parA[0][j] = g1_Ez[j]->Eval(zValNew);
       parA[1][j] = g2_Ez[j]->Eval(zValNew);
       parA[2][j] = g3_Ez[j]->Eval(zValNew);
@@ -465,20 +456,17 @@ double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xVa
   double aValNew;
   double bValNew;
 
-  if(axis == "Y")
-  {
+  if (axis == "Y") {
     aValNew = xValNew;
     bValNew = yValNew;
   }
-  else
-  {
+  else {
     aValNew = yValNew;
     bValNew = xValNew;
   }
 
   double offsetValNew = 0.0;
-  if(axis == "X")
-  {
+  if (axis == "X") {
     parB[0] = f1_Ex->Eval(aValNew);
     parB[1] = f2_Ex->Eval(aValNew);
     parB[2] = f3_Ex->Eval(aValNew);
@@ -488,8 +476,7 @@ double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xVa
     fFinal_Ex->SetParameters(parB);
     offsetValNew = fFinal_Ex->Eval(bValNew);
   }
-  else if(axis == "Y")
-  {
+  else if (axis == "Y") {
     parB[0] = f1_Ey->Eval(aValNew);
     parB[1] = f2_Ey->Eval(aValNew);
     parB[2] = f3_Ey->Eval(aValNew);
@@ -500,8 +487,7 @@ double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xVa
     fFinal_Ey->SetParameters(parB);
     offsetValNew = fFinal_Ey->Eval(bValNew);
   }
-  else if(axis == "Z")
-  {
+  else if (axis == "Z") {
     parB[0] = f1_Ez->Eval(aValNew);
     parB[1] = f2_Ez->Eval(aValNew);
     parB[2] = f3_Ez->Eval(aValNew);
@@ -519,7 +505,7 @@ double spacecharge::SpaceChargeStandard::GetOneEfieldOffsetParametric(double xVa
 double spacecharge::SpaceChargeStandard::TransformX(double xVal) const
 {
   double xValNew;
-  xValNew = xVal/100.0;
+  xValNew = xVal / 100.0;
 
   return xValNew;
 }
@@ -529,7 +515,7 @@ double spacecharge::SpaceChargeStandard::TransformX(double xVal) const
 double spacecharge::SpaceChargeStandard::TransformY(double yVal) const
 {
   double yValNew;
-  yValNew = yVal/100.0;
+  yValNew = yVal / 100.0;
 
   return yValNew;
 }
@@ -539,14 +525,16 @@ double spacecharge::SpaceChargeStandard::TransformY(double yVal) const
 double spacecharge::SpaceChargeStandard::TransformZ(double zVal) const
 {
   double zValNew;
-  zValNew = zVal/100.0;
+  zValNew = zVal / 100.0;
 
   return zValNew;
 }
 
 //----------------------------------------------------------------------------
 /// Check to see if point is inside boundaries of map - redefine this in experiment-specific implementation!
-bool spacecharge::SpaceChargeStandard::IsInsideBoundaries(double xVal, double yVal, double zVal) const
+bool spacecharge::SpaceChargeStandard::IsInsideBoundaries(double xVal,
+                                                          double yVal,
+                                                          double zVal) const
 {
   bool isInside = false;
 

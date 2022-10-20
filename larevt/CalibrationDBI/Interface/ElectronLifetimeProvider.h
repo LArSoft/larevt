@@ -18,20 +18,17 @@ namespace lariov {
      Pure abstract interface class for retrieving electron lifetimes.
 
   */
-  class ElectronLifetimeProvider: private lar::UncopiableAndUnmovableClass {
+  class ElectronLifetimeProvider : private lar::UncopiableAndUnmovableClass {
 
-    public:
+  public:
+    virtual ~ElectronLifetimeProvider() = default;
 
-      virtual ~ElectronLifetimeProvider() = default;
-
-      /// Retrieve pedestal information
-      virtual float Lifetime(float t) const = 0;
-      virtual float Purity() const = 0;
-      virtual float LifetimeErr(float t) const = 0;
-      virtual float PurityErr() const = 0;
-
-
+    /// Retrieve pedestal information
+    virtual float Lifetime(float t) const = 0;
+    virtual float Purity() const = 0;
+    virtual float LifetimeErr(float t) const = 0;
+    virtual float PurityErr() const = 0;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif

@@ -62,8 +62,7 @@ cluster::SmallClusterFilter::SmallClusterFilter(fhicl::ParameterSet const& pset)
   }
 }
 
-bool
-cluster::SmallClusterFilter::filter(art::Event& evt)
+bool cluster::SmallClusterFilter::filter(art::Event& evt)
 {
   auto const& hits = *evt.getValidHandle<std::vector<recob::Hit>>(fHitFinderModuleLabel);
 
@@ -92,7 +91,6 @@ cluster::SmallClusterFilter::filter(art::Event& evt)
     ++hitsPerPlane[hit.WireID().Plane];
 
     if (hit.SignalType() == geo::kCollection) collFound = true;
-
   }
 
   for (unsigned int i = 0; i < fNPlanes; i++) {

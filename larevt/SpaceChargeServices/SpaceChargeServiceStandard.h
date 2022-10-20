@@ -35,11 +35,7 @@ namespace spacecharge {
     void reconfigure(fhicl::ParameterSet const& pset);
     void preBeginRun(const art::Run& run);
 
-    const provider_type*
-    provider() const override
-    {
-      return &fProp;
-    }
+    const provider_type* provider() const override { return &fProp; }
 
     spacecharge::SpaceChargeStandard fProp;
 

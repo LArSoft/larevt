@@ -14,8 +14,8 @@
 #ifndef IOVDATA_PMTGAIN_H
 #define IOVDATA_PMTGAIN_H
 
-#include "ChData.h"
 #include "CalibrationExtraInfo.h"
+#include "ChData.h"
 
 namespace lariov {
   /**
@@ -23,30 +23,25 @@ namespace lariov {
   */
   class PmtGain : public ChData {
 
-    public:
+  public:
+    /// Constructor
+    PmtGain(unsigned int ch) : ChData(ch), fExtraInfo("PmtGain") {}
 
-      /// Constructor
-      PmtGain(unsigned int ch) :
-        ChData(ch),
-	fExtraInfo("PmtGain") {}
+    /// Default destructor
+    ~PmtGain() {}
 
-      /// Default destructor
-      ~PmtGain() {}
+    float Gain() const { return fGain; }
+    float GainErr() const { return fGainErr; }
+    CalibrationExtraInfo const& ExtraInfo() const { return fExtraInfo; }
 
-      float Gain()    const { return fGain; }
-      float GainErr() const { return fGainErr; }
-      CalibrationExtraInfo const& ExtraInfo() const { return fExtraInfo; }
+    void SetGain(float v) { fGain = v; }
+    void SetGainErr(float v) { fGainErr = v; }
+    void SetExtraInfo(CalibrationExtraInfo const& info) { fExtraInfo = info; }
 
-      void SetGain(float v)    { fGain    = v; }
-      void SetGainErr(float v) { fGainErr = v; }
-      void SetExtraInfo(CalibrationExtraInfo const& info)
-      { fExtraInfo = info; }
-
-    private:
-
-      float fGain;
-      float fGainErr;
-      CalibrationExtraInfo fExtraInfo;
+  private:
+    float fGain;
+    float fGainErr;
+    CalibrationExtraInfo fExtraInfo;
 
   }; // end class
 } // end namespace lariov

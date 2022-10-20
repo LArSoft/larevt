@@ -12,34 +12,32 @@
 // C/C++ standard libraries
 #include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
 
-
-namespace spacecharge{
+namespace spacecharge {
 
   class SpaceCharge {
-    public:
+  public:
+    SpaceCharge(const SpaceCharge&) = delete;
+    SpaceCharge(SpaceCharge&&) = delete;
+    SpaceCharge& operator=(const SpaceCharge&) = delete;
+    SpaceCharge& operator=(SpaceCharge&&) = delete;
+    virtual ~SpaceCharge() = default;
 
-      SpaceCharge(const SpaceCharge &) = delete;
-      SpaceCharge(SpaceCharge &&) = delete;
-      SpaceCharge& operator = (const SpaceCharge &) = delete;
-      SpaceCharge& operator = (SpaceCharge &&) = delete;
-      virtual ~SpaceCharge() = default;
+    virtual bool EnableSimSpatialSCE() const = 0;
+    virtual bool EnableSimEfieldSCE() const = 0;
+    virtual bool EnableCorrSCE() const = 0;
+    virtual bool EnableCalSpatialSCE() const = 0;
+    virtual bool EnableCalEfieldSCE() const = 0;
 
-      virtual bool EnableSimSpatialSCE() const = 0;
-      virtual bool EnableSimEfieldSCE() const = 0;
-      virtual bool EnableCorrSCE() const = 0;
-      virtual bool EnableCalSpatialSCE() const = 0;
-      virtual bool EnableCalEfieldSCE() const = 0;
+    virtual geo::Vector_t GetPosOffsets(geo::Point_t const& point) const = 0;
+    virtual geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const = 0;
+    virtual geo::Vector_t GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const = 0;
+    virtual geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point,
+                                              int const& TPCid) const = 0;
 
-      virtual geo::Vector_t GetPosOffsets(geo::Point_t const& point) const = 0;
-      virtual geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const = 0;
-	  virtual geo::Vector_t GetCalPosOffsets(geo::Point_t const& point, int const& TPCid) const = 0;
-	  virtual geo::Vector_t GetCalEfieldOffsets(geo::Point_t const& point, int const& TPCid) const = 0;
+  protected:
+    SpaceCharge() = default;
 
-    protected:
-
-      SpaceCharge() = default;
-
-    }; // class SpaceCharge
+  }; // class SpaceCharge
 } //namespace spacecharge
 
 #endif // SPACECHARGE_SPACECHARGE_H

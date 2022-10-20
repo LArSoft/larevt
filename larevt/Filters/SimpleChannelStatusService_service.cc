@@ -14,7 +14,7 @@
 
 namespace lariov {
 
-  DEFINE_ART_SERVICE_INTERFACE_IMPL
-    (lariov::SimpleChannelStatusService, lariov::ChannelStatusService)
+  DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SimpleChannelStatusService,
+                                    lariov::ChannelStatusService)
 
 }

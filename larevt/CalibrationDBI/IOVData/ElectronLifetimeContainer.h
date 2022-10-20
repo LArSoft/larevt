@@ -19,33 +19,30 @@ namespace lariov {
   */
   class ElectronLifetimeContainer : public ChData {
 
-    public:
+  public:
+    /// Constructor
+    ElectronLifetimeContainer(unsigned int ch) : ChData(ch) {}
 
-      /// Constructor
-      ElectronLifetimeContainer(unsigned int ch) : ChData(ch) {}
+    /// Default destructor
+    ~ElectronLifetimeContainer() {}
 
-      /// Default destructor
-      ~ElectronLifetimeContainer() {}
+    float ExpOffset() const { return fExpOffset; }
+    float TimeConstant() const { return fTimeConstant; }
+    float ExpOffsetErr() const { return fExpOffsetErr; }
+    float TimeConstantErr() const { return fTimeConstantErr; }
 
-      float ExpOffset()       const { return fExpOffset; }
-      float TimeConstant()    const { return fTimeConstant; }
-      float ExpOffsetErr()    const { return fExpOffsetErr; }
-      float TimeConstantErr() const { return fTimeConstantErr; }
+    void SetExpOffset(float val) { fExpOffset = val; }
+    void SetTimeConstant(float val) { fTimeConstant = val; }
+    void SetExpOffsetErr(float val) { fExpOffsetErr = val; }
+    void SetTimeConstantErr(float val) { fTimeConstantErr = val; }
 
-      void SetExpOffset(float val)       { fExpOffset       = val; }
-      void SetTimeConstant(float val)    { fTimeConstant    = val; }
-      void SetExpOffsetErr(float val)    { fExpOffsetErr    = val; }
-      void SetTimeConstantErr(float val) { fTimeConstantErr = val; }
-
-    private:
-
-      float fExpOffset;
-      float fTimeConstant;
-      float fExpOffsetErr;
-      float fTimeConstantErr;
+  private:
+    float fExpOffset;
+    float fTimeConstant;
+    float fExpOffsetErr;
+    float fTimeConstantErr;
 
   }; // end class
 } // end namespace lariov
 
 #endif
-

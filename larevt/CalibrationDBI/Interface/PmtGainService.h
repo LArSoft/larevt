@@ -24,31 +24,25 @@ namespace lariov {
    */
   class PmtGainService {
 
-    public:
-      using provider_type = PmtGainProvider;
+  public:
+    using provider_type = PmtGainProvider;
 
-      /// Destructor
-      virtual ~PmtGainService() = default;
+    /// Destructor
+    virtual ~PmtGainService() = default;
 
-      //retrieve provider
-      PmtGainProvider const& GetProvider() const
-      { return DoGetProvider(); }
+    //retrieve provider
+    PmtGainProvider const& GetProvider() const { return DoGetProvider(); }
 
-      PmtGainProvider const* GetProviderPtr() const
-      { return DoGetProviderPtr(); }
+    PmtGainProvider const* GetProviderPtr() const { return DoGetProviderPtr(); }
 
-    private:
+  private:
+    /// Returns a reference to the service provider
+    virtual PmtGainProvider const& DoGetProvider() const = 0;
 
-      /// Returns a reference to the service provider
-      virtual PmtGainProvider const& DoGetProvider() const = 0;
-
-      virtual PmtGainProvider const* DoGetProviderPtr() const = 0;
-
-
+    virtual PmtGainProvider const* DoGetProviderPtr() const = 0;
 
   }; // class PmtGainService
 } // namespace lariov
-
 
 DECLARE_ART_SERVICE_INTERFACE(lariov::PmtGainService, LEGACY)
 

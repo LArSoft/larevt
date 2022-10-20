@@ -13,41 +13,34 @@
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
 
 // Framework libraries
-#include "fhiclcpp/ParameterSet.h"
 #include "cetlib/container_algorithms.h"
 #include "cetlib_except/exception.h"
-
+#include "fhiclcpp/ParameterSet.h"
 
 // C/C++ standard libraries
 #include <iterator> // std::inserter()
-#include <utility> // std::pair<>
+#include <utility>  // std::pair<>
 
 namespace lariov {
 
-
   //----------------------------------------------------------------------------
   SimpleChannelStatus::SimpleChannelStatus(fhicl::ParameterSet const& pset)
-    : fMaxChannel(raw::InvalidChannelID)
-    , fMaxPresentChannel(raw::InvalidChannelID)
+    : fMaxChannel(raw::InvalidChannelID), fMaxPresentChannel(raw::InvalidChannelID)
   {
     using chan_vect_t = std::vector<raw::ChannelID_t>;
 
     // Read the bad channels as a vector, then convert it into a set
     auto BadChannels = pset.get<chan_vect_t>("BadChannels", {});
-    cet::copy_all(BadChannels,
-                  std::inserter(fBadChannels, fBadChannels.begin()));
+    cet::copy_all(BadChannels, std::inserter(fBadChannels, fBadChannels.begin()));
 
     // Read the noise channels as a vector, then convert it into a set
     auto NoisyChannels = pset.get<chan_vect_t>("NoisyChannels", {});
-    cet::copy_all(NoisyChannels,
-                  std::inserter(fNoisyChannels, fNoisyChannels.begin()));
+    cet::copy_all(NoisyChannels, std::inserter(fNoisyChannels, fNoisyChannels.begin()));
 
   } // SimpleChannelStatus::SimpleChannelStatus()
 
-
   //----------------------------------------------------------------------------
-  void SimpleChannelStatus::Setup
-    (raw::ChannelID_t MaxChannel, raw::ChannelID_t MaxGoodChannel)
+  void SimpleChannelStatus::Setup(raw::ChannelID_t MaxChannel, raw::ChannelID_t MaxGoodChannel)
   {
 
     fMaxChannel = MaxChannel;
@@ -58,47 +51,45 @@ namespace lariov {
 
   } // SimpleChannelStatus::Setup()
 
-
   //----------------------------------------------------------------------------
-  bool SimpleChannelStatus::IsPresent(raw::ChannelID_t channel) const {
-    return raw::isValidChannelID(fMaxPresentChannel)
-      ? raw::isValidChannelID(channel) && (channel <= fMaxPresentChannel)
-      : true;
+  bool SimpleChannelStatus::IsPresent(raw::ChannelID_t channel) const
+  {
+    return raw::isValidChannelID(fMaxPresentChannel) ?
+             raw::isValidChannelID(channel) && (channel <= fMaxPresentChannel) :
+             true;
   } // SimpleChannelStatus::isPresent()
 
-
   //----------------------------------------------------------------------------
-  SimpleChannelStatus::ChannelSet_t SimpleChannelStatus::GoodChannels() const {
+  SimpleChannelStatus::ChannelSet_t SimpleChannelStatus::GoodChannels() const
+  {
 
     if (!fGoodChannels) FillGoodChannels();
     return *fGoodChannels;
 
   } // SimpleChannelStatus::GoodChannels()
 
-
   //----------------------------------------------------------------------------
-  void SimpleChannelStatus::FillGoodChannels() const {
+  void SimpleChannelStatus::FillGoodChannels() const
+  {
 
     if (!fGoodChannels) fGoodChannels.reset(new ChannelSet_t);
 
     ChannelSet_t& GoodChannels = *fGoodChannels;
     GoodChannels.clear();
 
-    std::vector
-      <std::pair<ChannelSet_t::const_iterator, ChannelSet_t::const_iterator>>
-      VetoedIDs;
+    std::vector<std::pair<ChannelSet_t::const_iterator, ChannelSet_t::const_iterator>> VetoedIDs;
 
     VetoedIDs.emplace_back(fBadChannels.cbegin(), fBadChannels.cend());
     VetoedIDs.emplace_back(fNoisyChannels.cbegin(), fNoisyChannels.cend());
 
     // go for the first (lowest) channel ID...
     raw::ChannelID_t channel = 0;
-    while (!raw::isValidChannelID(channel)) ++channel;
+    while (!raw::isValidChannelID(channel))
+      ++channel;
 
     // ... to the last present one
     raw::ChannelID_t last_channel = fMaxChannel;
-    if (raw::isValidChannelID(fMaxPresentChannel)
-      && (fMaxPresentChannel < last_channel))
+    if (raw::isValidChannelID(fMaxPresentChannel) && (fMaxPresentChannel < last_channel))
       last_channel = fMaxPresentChannel;
 
     // if we don't know how many channels
@@ -114,7 +105,7 @@ namespace lariov {
       bool bGood = true;
 
       // check if this channel is in any of the vetoed lists
-      for (auto iter: VetoedIDs) {
+      for (auto iter : VetoedIDs) {
 
         // check all the remaining vetoed channels in this list
         while (iter.first != iter.second) {
@@ -134,7 +125,7 @@ namespace lariov {
         } // while
 
         if (!bGood) break; // already known bad, we are done
-      } // for
+      }                    // for
 
       // add the channel
       if (bGood) GoodChannels.insert(channel);
@@ -142,7 +133,6 @@ namespace lariov {
     } // while
 
   } // SimpleChannelStatus::GoodChannels()
-
 
   //----------------------------------------------------------------------------
 

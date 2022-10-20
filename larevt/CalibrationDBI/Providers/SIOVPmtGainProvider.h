@@ -11,11 +11,11 @@
 #ifndef SIOVPMTGAINPROVIDER_H
 #define SIOVPMTGAINPROVIDER_H
 
+#include "DatabaseRetrievalAlg.h"
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/IOVData/PmtGain.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
-#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/PmtGainProvider.h"
-#include "DatabaseRetrievalAlg.h"
 
 namespace lariov {
 
@@ -37,43 +37,40 @@ namespace lariov {
    */
   class SIOVPmtGainProvider : public DatabaseRetrievalAlg, public PmtGainProvider {
 
-    public:
+  public:
+    /// Constructors
+    SIOVPmtGainProvider(fhicl::ParameterSet const& p);
 
-      /// Constructors
-      SIOVPmtGainProvider(fhicl::ParameterSet const& p);
+    /// Reconfigure function called by fhicl constructor
+    void Reconfigure(fhicl::ParameterSet const& p) override;
 
-      /// Reconfigure function called by fhicl constructor
-      void Reconfigure(fhicl::ParameterSet const& p) override;
+    /// Update event time stamp.
+    void UpdateTimeStamp(DBTimeStamp_t ts);
 
-      /// Update event time stamp.
-      void UpdateTimeStamp(DBTimeStamp_t ts);
+    /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
+    bool Update(DBTimeStamp_t ts);
 
-      /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(DBTimeStamp_t ts);
+    /// Retrieve gain information
+    const PmtGain& PmtGainObject(DBChannelID_t ch) const;
+    float Gain(DBChannelID_t ch) const override;
+    float GainErr(DBChannelID_t ch) const override;
+    CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
 
-      /// Retrieve gain information
-      const PmtGain& PmtGainObject(DBChannelID_t ch) const;
-      float Gain(DBChannelID_t ch) const override;
-      float GainErr(DBChannelID_t ch) const override;
-      CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
+  private:
+    /// Do actual database updates.
 
-    private:
+    bool DBUpdate() const; // Uses current event time.
+    bool DBUpdate(DBTimeStamp_t ts) const;
 
-      /// Do actual database updates.
+    // Time stamps.
 
-      bool DBUpdate() const;                    // Uses current event time.
-      bool DBUpdate(DBTimeStamp_t ts) const;
+    DBTimeStamp_t fEventTimeStamp;           // Most recently seen time stamp.
+    mutable DBTimeStamp_t fCurrentTimeStamp; // Time stamp of cached data.
 
-      // Time stamps.
+    DataSource::ds fDataSource;
 
-      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
-      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
-
-      DataSource::ds fDataSource;
-
-      mutable Snapshot<PmtGain> fData;
+    mutable Snapshot<PmtGain> fData;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif
-

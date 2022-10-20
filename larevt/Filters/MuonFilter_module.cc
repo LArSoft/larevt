@@ -72,12 +72,10 @@ namespace filter {
   {}
 
   //-------------------------------------------------
-  bool
-  MuonFilter::filter(art::Event& evt)
+  bool MuonFilter::filter(art::Event& evt)
   {
     art::ServiceHandle<geo::Geometry const> geom;
-    auto const clockData =
-      art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
+    auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
     auto const detProp =
       art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(evt, clockData);
 

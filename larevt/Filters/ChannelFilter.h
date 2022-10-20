@@ -15,7 +15,9 @@
 #define CHANNELFILTER_H
 
 // LArSoft libraries
-namespace lariov { class ChannelStatusProvider; }
+namespace lariov {
+  class ChannelStatusProvider;
+}
 
 // C/C++ standard libraries
 #include <set>
@@ -26,12 +28,7 @@ namespace filter {
   class /* [[deprecated]] */ ChannelFilter {
 
   public:
-
-    enum ChannelStatus { GOOD        = 0,
-                         NOISY       = 1,
-                         DEAD        = 2,
-                         NOTPHYSICAL = 3
-                       };
+    enum ChannelStatus { GOOD = 0, NOISY = 1, DEAD = 2, NOTPHYSICAL = 3 };
 
     ChannelFilter();
 

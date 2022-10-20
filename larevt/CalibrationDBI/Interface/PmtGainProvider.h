@@ -9,8 +9,8 @@
 #ifndef PMTGAINPROVIDER_H
 #define PMTGAINPROVIDER_H
 
-#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larevt/CalibrationDBI/IOVData/CalibrationExtraInfo.h"
 
 namespace lariov {
@@ -21,18 +21,17 @@ namespace lariov {
    * - pmt gain and its error
    * - pmt extra info, related to procedure that determines gain
    */
-  class PmtGainProvider: private lar::UncopiableAndUnmovableClass {
+  class PmtGainProvider : private lar::UncopiableAndUnmovableClass {
 
-    public:
+  public:
+    virtual ~PmtGainProvider() = default;
 
-      virtual ~PmtGainProvider() = default;
+    /// Retrieve pmt gain information
+    virtual float Gain(raw::ChannelID_t ch) const = 0;
+    virtual float GainErr(raw::ChannelID_t ch) const = 0;
 
-      /// Retrieve pmt gain information
-      virtual float Gain(raw::ChannelID_t ch) const = 0;
-      virtual float GainErr(raw::ChannelID_t ch) const = 0;
-
-      virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
+    virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif

@@ -6,7 +6,6 @@
  * @see    ChannelStatusService.h SimpleChannelStatus.cpp
  */
 
-
 #ifndef SIMPLECHANNELFILTER_H
 #define SIMPLECHANNELFILTER_H 1
 
@@ -15,14 +14,14 @@
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // Utility libraries
-namespace fhicl { class ParameterSet; }
+namespace fhicl {
+  class ParameterSet;
+}
 
 // C/C++ standard library
 #include <memory> // std::unique_ptr<>
 
-
 namespace lariov {
-
 
   /** **************************************************************************
    * @brief Class providing information about the quality of channels
@@ -46,8 +45,8 @@ namespace lariov {
    *   channels
    *
    */
-  class SimpleChannelStatus: public lariov::ChannelStatusProvider {
-      public:
+  class SimpleChannelStatus : public lariov::ChannelStatusProvider {
+  public:
     using ChannelSet_t = lariov::ChannelStatusProvider::ChannelSet_t;
 
     /// Configuration
@@ -64,17 +63,22 @@ namespace lariov {
 
     /// Returns whether the specified channel is physical and good
     virtual bool IsGood(raw::ChannelID_t channel) const override
-      { return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel); }
+    {
+      return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
+    }
 
     /// Returns whether the specified channel is bad in the current run
     virtual bool IsBad(raw::ChannelID_t channel) const override
-      { return fBadChannels.count(channel) > 0; }
+    {
+      return fBadChannels.count(channel) > 0;
+    }
 
     /// Returns whether the specified channel is noisy in the current run
     virtual bool IsNoisy(raw::ChannelID_t channel) const override
-      { return fNoisyChannels.count(channel) > 0; }
+    {
+      return fNoisyChannels.count(channel) > 0;
+    }
     /// @}
-
 
     /// @name Global channel queries
     /// @{
@@ -82,14 +86,11 @@ namespace lariov {
     virtual ChannelSet_t GoodChannels() const override;
 
     /// Returns a copy of set of bad channel IDs for the current run
-    virtual ChannelSet_t BadChannels() const override
-      { return fBadChannels; }
+    virtual ChannelSet_t BadChannels() const override { return fBadChannels; }
 
     /// Returns a copy of set of noisy channel IDs for the current run
-    virtual ChannelSet_t NoisyChannels() const override
-      { return fNoisyChannels; }
+    virtual ChannelSet_t NoisyChannels() const override { return fNoisyChannels; }
     /// @}
-
 
     //
     // non-interface methods and configuration methods
@@ -100,8 +101,6 @@ namespace lariov {
 
     /// Returns the ID of the largest present channel
     raw::ChannelID_t MaxChannelPresent() const { return fMaxPresentChannel; }
-
-
 
     /// @name Configuration functions
     /// @{
@@ -134,12 +133,11 @@ namespace lariov {
 
     ///@}
 
-      protected:
-
-    ChannelSet_t fBadChannels; ///< set of bad channels
+  protected:
+    ChannelSet_t fBadChannels;   ///< set of bad channels
     ChannelSet_t fNoisyChannels; ///< set of noisy channels
 
-    raw::ChannelID_t fMaxChannel; ///< largest ID among existing channels
+    raw::ChannelID_t fMaxChannel;        ///< largest ID among existing channels
     raw::ChannelID_t fMaxPresentChannel; ///< largest ID among present channels
 
     /// cached set of good channels (lazy evaluation)
@@ -150,8 +148,6 @@ namespace lariov {
 
   }; // class SimpleChannelStatus
 
-
 } // namespace lariov
-
 
 #endif // SIMPLECHANNELFILTER_H

@@ -9,8 +9,8 @@
 #ifndef ELECTRONICSCALIBPROVIDER_H
 #define ELECTRONICSCALIBPROVIDER_H
 
-#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larevt/CalibrationDBI/IOVData/CalibrationExtraInfo.h"
 
 namespace lariov {
@@ -22,20 +22,19 @@ namespace lariov {
    * - electronics shaping time and its error
    * - electronics extra info, related to procedure that determines the gain and shaping time
    */
-  class ElectronicsCalibProvider: private lar::UncopiableAndUnmovableClass {
+  class ElectronicsCalibProvider : private lar::UncopiableAndUnmovableClass {
 
-    public:
+  public:
+    virtual ~ElectronicsCalibProvider() = default;
 
-      virtual ~ElectronicsCalibProvider() = default;
+    /// Retrieve pmt gain information
+    virtual float Gain(raw::ChannelID_t ch) const = 0;
+    virtual float GainErr(raw::ChannelID_t ch) const = 0;
+    virtual float ShapingTime(raw::ChannelID_t ch) const = 0;
+    virtual float ShapingTimeErr(raw::ChannelID_t ch) const = 0;
 
-      /// Retrieve pmt gain information
-      virtual float Gain(raw::ChannelID_t ch) const = 0;
-      virtual float GainErr(raw::ChannelID_t ch) const = 0;
-      virtual float ShapingTime(raw::ChannelID_t ch) const = 0;
-      virtual float ShapingTimeErr(raw::ChannelID_t ch) const = 0;
-
-      virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
+    virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif

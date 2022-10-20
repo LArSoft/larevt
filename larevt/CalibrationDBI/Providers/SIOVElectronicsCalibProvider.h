@@ -11,11 +11,11 @@
 #ifndef SIOVELECTRONICSCALIBPROVIDER_H
 #define SIOVELECTRONICSCALIBPROVIDER_H
 
-#include "larevt/CalibrationDBI/IOVData/ElectronicsCalib.h"
-#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
-#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
-#include "larevt/CalibrationDBI/Interface/ElectronicsCalibProvider.h"
 #include "DatabaseRetrievalAlg.h"
+#include "larevt/CalibrationDBI/IOVData/ElectronicsCalib.h"
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
+#include "larevt/CalibrationDBI/Interface/ElectronicsCalibProvider.h"
 
 namespace lariov {
 
@@ -39,47 +39,45 @@ namespace lariov {
    * - *DefaultShapingTimeErr* (real, default: ): Shaping Time uncertainty returned
    *   when /UseDB/ and /UseFile/ parameters are false
    */
-  class SIOVElectronicsCalibProvider : public DatabaseRetrievalAlg, public ElectronicsCalibProvider {
+  class SIOVElectronicsCalibProvider : public DatabaseRetrievalAlg,
+                                       public ElectronicsCalibProvider {
 
-    public:
+  public:
+    /// Constructors
+    SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p);
 
-      /// Constructors
-      SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p);
+    /// Reconfigure function called by fhicl constructor
+    void Reconfigure(fhicl::ParameterSet const& p) override;
 
-      /// Reconfigure function called by fhicl constructor
-      void Reconfigure(fhicl::ParameterSet const& p) override;
+    /// Update event time stamp.
+    void UpdateTimeStamp(DBTimeStamp_t ts);
 
-      /// Update event time stamp.
-      void UpdateTimeStamp(DBTimeStamp_t ts);
+    /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
+    bool Update(DBTimeStamp_t ts);
 
-      /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(DBTimeStamp_t ts);
+    /// Retrieve electronics calibration information
+    const ElectronicsCalib& ElectronicsCalibObject(DBChannelID_t ch) const;
+    float Gain(DBChannelID_t ch) const override;
+    float GainErr(DBChannelID_t ch) const override;
+    float ShapingTime(DBChannelID_t ch) const override;
+    float ShapingTimeErr(DBChannelID_t ch) const override;
+    CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
 
-      /// Retrieve electronics calibration information
-      const ElectronicsCalib& ElectronicsCalibObject(DBChannelID_t ch) const;
-      float Gain(DBChannelID_t ch) const override;
-      float GainErr(DBChannelID_t ch) const override;
-      float ShapingTime(DBChannelID_t ch) const override;
-      float ShapingTimeErr(DBChannelID_t ch) const override;
-      CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
+  private:
+    /// Do actual database updates.
 
-    private:
+    bool DBUpdate() const; // Uses current event time.
+    bool DBUpdate(DBTimeStamp_t ts) const;
 
-      /// Do actual database updates.
+    // Time stamps.
 
-      bool DBUpdate() const;                    // Uses current event time.
-      bool DBUpdate(DBTimeStamp_t ts) const;
+    DBTimeStamp_t fEventTimeStamp;           // Most recently seen time stamp.
+    mutable DBTimeStamp_t fCurrentTimeStamp; // Time stamp of cached data.
 
-      // Time stamps.
+    DataSource::ds fDataSource;
 
-      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
-      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
-
-      DataSource::ds fDataSource;
-
-      mutable Snapshot<ElectronicsCalib> fData;
+    mutable Snapshot<ElectronicsCalib> fData;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif
-

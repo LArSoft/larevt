@@ -28,15 +28,13 @@ spacecharge::SpaceChargeServiceStandard::SpaceChargeServiceStandard(fhicl::Param
 }
 
 //----------------------------------------------
-void
-spacecharge::SpaceChargeServiceStandard::preBeginRun(const art::Run& run)
+void spacecharge::SpaceChargeServiceStandard::preBeginRun(const art::Run& run)
 {
   fProp.Update(run.run());
 }
 
 //------------------------------------------------
-void
-spacecharge::SpaceChargeServiceStandard::reconfigure(fhicl::ParameterSet const& pset)
+void spacecharge::SpaceChargeServiceStandard::reconfigure(fhicl::ParameterSet const& pset)
 {
   fProp.Configure(pset);
 }

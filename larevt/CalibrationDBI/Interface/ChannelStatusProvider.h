@@ -12,18 +12,16 @@
  * ChannelStatusService) or from whatever system needs it.
  */
 
-
 #ifndef CHANNELSTATUSPROVIDER_H
 #define CHANNELSTATUSPROVIDER_H 1
 
 // C/C++ standard libraries
-#include <set>
 #include <limits> // std::numeric_limits<>
+#include <set>
 
 // LArSoft libraries
 #include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-
 
 /// Filters for channels, events, etc
 namespace lariov {
@@ -46,77 +44,73 @@ namespace lariov {
    * interested in.
    *
    */
-  class ChannelStatusProvider: private lar::UncopiableAndUnmovableClass {
+  class ChannelStatusProvider : private lar::UncopiableAndUnmovableClass {
 
-    public:
+  public:
+    using Status_t = unsigned short; ///< type representing channel status
 
-      using Status_t = unsigned short; ///< type representing channel status
+    /// Type of set of channel IDs
+    using ChannelSet_t = std::set<raw::ChannelID_t>;
 
-      /// Type of set of channel IDs
-      using ChannelSet_t = std::set<raw::ChannelID_t>;
+    /// Value or invalid status
+    static constexpr Status_t InvalidStatus = std::numeric_limits<Status_t>::max();
 
-      /// Value or invalid status
-      static constexpr Status_t InvalidStatus
-        = std::numeric_limits<Status_t>::max();
+    /// Default constructor
+    ChannelStatusProvider() = default;
 
-      /// Default constructor
-      ChannelStatusProvider() = default;
+    // do not allow for copies or moves of this class
+    ChannelStatusProvider(ChannelStatusProvider const&) = delete;
+    ChannelStatusProvider(ChannelStatusProvider&&) = delete;
+    ChannelStatusProvider& operator=(ChannelStatusProvider const&) = delete;
+    ChannelStatusProvider& operator=(ChannelStatusProvider&&) = delete;
 
-      // do not allow for copies or moves of this class
-      ChannelStatusProvider(ChannelStatusProvider const&) = delete;
-      ChannelStatusProvider(ChannelStatusProvider&&) = delete;
-      ChannelStatusProvider& operator = (ChannelStatusProvider const&) = delete;
-      ChannelStatusProvider& operator = (ChannelStatusProvider&&) = delete;
+    /// Virtual destructor; destructs nothing
+    virtual ~ChannelStatusProvider() = default;
 
-      /// Virtual destructor; destructs nothing
-      virtual ~ChannelStatusProvider() = default;
+    /// Returns whether the specified channel is physical and connected to wire
+    virtual bool IsPresent(raw::ChannelID_t channel) const = 0;
 
-      /// Returns whether the specified channel is physical and connected to wire
-      virtual bool IsPresent(raw::ChannelID_t channel) const = 0;
+    /// Returns whether the specified channel is bad in the current run
+    virtual bool IsBad(raw::ChannelID_t channel) const = 0;
 
-      /// Returns whether the specified channel is bad in the current run
-      virtual bool IsBad(raw::ChannelID_t channel) const = 0;
+    /// Returns whether the specified channel is noisy in the current run
+    virtual bool IsNoisy(raw::ChannelID_t channel) const = 0;
 
-      /// Returns whether the specified channel is noisy in the current run
-      virtual bool IsNoisy(raw::ChannelID_t channel) const = 0;
+    /// Returns whether the specified channel is physical and good
+    virtual bool IsGood(raw::ChannelID_t channel) const
+    {
+      return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
+    }
 
-      /// Returns whether the specified channel is physical and good
-      virtual bool IsGood(raw::ChannelID_t channel) const {
-        return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
-      }
+    /// Returns a status integer with arbitrary meaning
+    virtual Status_t Status(raw::ChannelID_t channel) const { return InvalidStatus; }
 
-      /// Returns a status integer with arbitrary meaning
-      virtual Status_t Status(raw::ChannelID_t channel) const
-        { return InvalidStatus; }
+    /// Returns whether the specified status is a valid one
+    virtual bool HasStatus(raw::ChannelID_t channel) const
+    {
+      return IsValidStatus(Status(channel));
+    }
 
-      /// Returns whether the specified status is a valid one
-      virtual bool HasStatus(raw::ChannelID_t channel) const
-        { return IsValidStatus(Status(channel)); }
+    /// Returns a copy of set of good channel IDs for the current run
+    virtual ChannelSet_t GoodChannels() const = 0;
 
+    /// Returns a copy of set of bad channel IDs for the current run
+    virtual ChannelSet_t BadChannels() const = 0;
 
-      /// Returns a copy of set of good channel IDs for the current run
-      virtual ChannelSet_t GoodChannels() const = 0;
+    /// Returns a copy of set of noisy channel IDs for the current run
+    virtual ChannelSet_t NoisyChannels() const = 0;
 
-      /// Returns a copy of set of bad channel IDs for the current run
-      virtual ChannelSet_t BadChannels() const = 0;
-
-      /// Returns a copy of set of noisy channel IDs for the current run
-      virtual ChannelSet_t NoisyChannels() const = 0;
-
-
-      /* TODO DELME
+    /* TODO DELME
       /// Prepares the object to provide information about the specified time
       /// @return whether information is available for the specified time
       virtual bool Update(DBTimeStamp_t ts) = 0;
       */
 
-      /// Returns whether the specified status is a valid one
-      static bool IsValidStatus(Status_t status)
-        { return status != InvalidStatus; }
+    /// Returns whether the specified status is a valid one
+    static bool IsValidStatus(Status_t status) { return status != InvalidStatus; }
 
   }; // class ChannelStatusProvider
 
 } // namespace lariov
-
 
 #endif // CHANNELSTATUSPROVIDER_H

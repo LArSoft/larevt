@@ -22,30 +22,28 @@ namespace lariov {
   */
   class DetPedestal : public ChData {
 
-    public:
+  public:
+    /// Constructor
+    DetPedestal(unsigned int ch) : ChData(ch) {}
 
-      /// Constructor
-      DetPedestal(unsigned int ch) : ChData(ch) {}
+    /// Default destructor
+    ~DetPedestal() {}
 
-      /// Default destructor
-      ~DetPedestal() {}
+    float PedMean() const { return fPedMean; }
+    float PedRms() const { return fPedRms; }
+    float PedMeanErr() const { return fPedMeanErr; }
+    float PedRmsErr() const { return fPedRmsErr; }
 
-      float PedMean()    const { return fPedMean; }
-      float PedRms()     const { return fPedRms; }
-      float PedMeanErr() const { return fPedMeanErr; }
-      float PedRmsErr()  const { return fPedRmsErr; }
+    void SetPedMean(float pedMean) { fPedMean = pedMean; }
+    void SetPedRms(float pedRms) { fPedRms = pedRms; }
+    void SetPedMeanErr(float pedMeanErr) { fPedMeanErr = pedMeanErr; }
+    void SetPedRmsErr(float pedRmsErr) { fPedRmsErr = pedRmsErr; }
 
-      void SetPedMean(float pedMean)       { fPedMean    = pedMean; }
-      void SetPedRms(float pedRms)         { fPedRms     = pedRms; }
-      void SetPedMeanErr(float pedMeanErr) { fPedMeanErr = pedMeanErr; }
-      void SetPedRmsErr(float pedRmsErr)   { fPedRmsErr  = pedRmsErr; }
-
-    private:
-
-      float fPedMean;
-      float fPedRms;
-      float fPedMeanErr;
-      float fPedRmsErr;
+  private:
+    float fPedMean;
+    float fPedRms;
+    float fPedMeanErr;
+    float fPedRmsErr;
 
   }; // end class
 } // end namespace lariov

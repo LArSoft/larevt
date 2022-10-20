@@ -14,19 +14,18 @@
 #ifndef WEBDB_WEBERROR_H
 #define WEBDB_WEBERROR_H
 
-#include <iostream>
 #include <exception>
+#include <iostream>
 
 namespace lariov {
 
   /**
      \class WebError
   */
-  class WebError : public std::exception{
+  class WebError : public std::exception {
 
   public:
-
-    WebError(std::string msg="") : std::exception()
+    WebError(std::string msg = "") : std::exception()
     {
       _msg = "\033[93m";
       _msg += msg;
@@ -34,8 +33,7 @@ namespace lariov {
     }
 
     virtual ~WebError() throw(){};
-    virtual const char* what() const throw()
-    { return _msg.c_str(); }
+    virtual const char* what() const throw() { return _msg.c_str(); }
 
   private:
     std::string _msg;
@@ -45,4 +43,3 @@ namespace lariov {
 
 #endif
 /** @} */ // end of doxygen group
-

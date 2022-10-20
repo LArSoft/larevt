@@ -24,31 +24,25 @@ namespace lariov {
    */
   class ElectronicsCalibService {
 
-    public:
-      using provider_type = ElectronicsCalibProvider;
+  public:
+    using provider_type = ElectronicsCalibProvider;
 
-      /// Destructor
-      virtual ~ElectronicsCalibService() = default;
+    /// Destructor
+    virtual ~ElectronicsCalibService() = default;
 
-      //retrieve provider
-      ElectronicsCalibProvider const& GetProvider() const
-      { return DoGetProvider(); }
+    //retrieve provider
+    ElectronicsCalibProvider const& GetProvider() const { return DoGetProvider(); }
 
-      ElectronicsCalibProvider const* GetProviderPtr() const
-      { return DoGetProviderPtr(); }
+    ElectronicsCalibProvider const* GetProviderPtr() const { return DoGetProviderPtr(); }
 
-    private:
+  private:
+    /// Returns a reference to the service provider
+    virtual ElectronicsCalibProvider const& DoGetProvider() const = 0;
 
-      /// Returns a reference to the service provider
-      virtual ElectronicsCalibProvider const& DoGetProvider() const = 0;
-
-      virtual ElectronicsCalibProvider const* DoGetProviderPtr() const = 0;
-
-
+    virtual ElectronicsCalibProvider const* DoGetProviderPtr() const = 0;
 
   }; // class ElectronicsCalibService
 } // namespace lariov
-
 
 DECLARE_ART_SERVICE_INTERFACE(lariov::ElectronicsCalibService, LEGACY)
 
