@@ -4,6 +4,7 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "cetlib_except/exception.h"
 #include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include <fstream>
@@ -16,7 +17,6 @@ namespace lariov {
     , fEventTimeStamp(0)
     , fCurrentTimeStamp(0)
   {
-
     this->Reconfigure(p);
   }
 
@@ -53,8 +53,9 @@ namespace lariov {
       defaultGain.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
 
       art::ServiceHandle<geo::Geometry const> geo;
+      auto const& wireReadoutGeom = art::ServiceHandle<geo::WireReadout const>()->Get();
       for (unsigned int od = 0; od != geo->NOpDets(); ++od) {
-        if (geo->IsValidOpChannel(od)) {
+        if (wireReadoutGeom.IsValidOpChannel(od)) {
           defaultGain.SetChannel(od);
           fData.AddOrReplaceRow(defaultGain);
         }

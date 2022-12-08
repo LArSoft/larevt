@@ -27,8 +27,7 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "larcore/Geometry/Geometry.h"
-#include "lardata/Utilities/GeometryUtilities.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "lardataobj/RecoBase/Hit.h"
 
 namespace cluster {
@@ -53,7 +52,7 @@ cluster::SmallClusterFilter::SmallClusterFilter(fhicl::ParameterSet const& pset)
   , fHitFinderModuleLabel{pset.get<std::string>("HitFinderModuleLabel")}
   , fMaxHitsByPlane{pset.get<std::vector<std::size_t>>("MaxHitsByPlane")}
   , fMaxTotalHits{pset.get<std::size_t>("MaxTotalHits")}
-  , fNPlanes{art::ServiceHandle<geo::Geometry const>()->Nplanes()}
+  , fNPlanes{art::ServiceHandle<geo::WireReadout const>()->Get().Nplanes()}
 {
   if (size(fMaxHitsByPlane) != fNPlanes) {
     throw art::Exception{art::errors::Configuration}

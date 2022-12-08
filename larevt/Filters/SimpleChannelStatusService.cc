@@ -11,6 +11,7 @@
 
 // LArSoft libraries
 #include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 
 // Framework libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"
@@ -21,10 +22,10 @@ namespace lariov {
   //----------------------------------------------------------------------------
   SimpleChannelStatusService::SimpleChannelStatusService(fhicl::ParameterSet const& pset)
   {
-    SimpleChannelStatus* simple_filter = new SimpleChannelStatus(pset);
-
     raw::ChannelID_t MaxChannel =
-      raw::ChannelID_t(art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1);
+      art::ServiceHandle<geo::WireReadout const>()->Get().Nchannels() - 1;
+
+    SimpleChannelStatus* simple_filter = new SimpleChannelStatus(pset);
 
     simple_filter->Setup(MaxChannel);
 
