@@ -5,6 +5,7 @@
 
 #include "cetlib/search_path.h"
 #include "cetlib_except/exception.h"
+#include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "sqlite3.h"
 #include "wda.h"

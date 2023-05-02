@@ -59,9 +59,8 @@ namespace lariov {
       auto const default_indrms = p.get<float>("DefaultIndRms", 0.3);
 
       art::ServiceHandle<geo::Geometry const> geo;
-      geo::wire_id_iterator itW = geo->begin_wire_id();
-      for (; itW != geo->end_wire_id(); ++itW) {
-        DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
+      for (auto const& id : geo->Iterate<geo::WireID>()) {
+        DBChannelID_t ch = geo->PlaneWireToChannel(id);
         if (geo->SignalType(ch) == geo::kCollection) {
           DetPedestal DefaultColl(
             ch, default_collmean, default_mean_err, default_collrms, default_rms_err);

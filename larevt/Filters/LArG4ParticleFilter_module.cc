@@ -8,6 +8,7 @@
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "canvas/Persistency/Common/Ptr.h"
 
 //LArSoft
 #include "larcore/Geometry/Geometry.h"
@@ -171,29 +172,16 @@ namespace filt {
     int demand = fStartInTPC[index];
     if (demand == 0)
       return true; //We don't care if the particle starts in the TPC or not so pass the check
-    //Get starting position of particle
-    TLorentzVector starting_position_4vect = particle->Position(0);
-    double starting_position[3];
-    starting_position[0] = starting_position_4vect.X();
-    starting_position[1] = starting_position_4vect.Y();
-    starting_position[2] = starting_position_4vect.Z();
-
-    geo::TPCID tpcid = fGeom->FindTPCAtPosition(starting_position);
-    bool validtpc = tpcid.isValid;
+    //Get TPC corresponding to starting position of particle
+    geo::TPCID tpcid = fGeom->FindTPCAtPosition(geo::vect::toPoint(particle->Position(0).Vect()));
     //Now we need to compare if we have a TPC that we started in with whether we wanted to start in a TPC at all
-    if (validtpc) {
+    if (tpcid.isValid) {
       //The particle DID start in a TPC.  Now, did we WANT this to happen
-      if (demand == 1)
-        return true; //We DID want this to happen
-      else
-        return false;
+      return demand == 1;
     }
     else {
       //The particle did NOT start in a TPC.  Did we WANT this to happen?
-      if (demand == 2)
-        return true; //We DID want this to happen
-      else
-        return false;
+      return demand == 2;
     }
 
     //Assume true by default
@@ -208,28 +196,17 @@ namespace filt {
     if (demand == 0)
       return true; //We don't care if the particle stops in the TPC or not so pass the check
     //Get final position of particle
-    TLorentzVector final_position_4vect =
-      particle->Position(particle->NumberTrajectoryPoints() - 1);
-    double final_position[3];
-    final_position[0] = final_position_4vect.X();
-    final_position[1] = final_position_4vect.Y();
-    final_position[2] = final_position_4vect.Z();
+    auto const final_position = particle->Position(particle->NumberTrajectoryPoints() - 1).Vect();
 
     geo::TPCID tpcid = fGeom->FindTPCAtPosition(geo::vect::toPoint(final_position));
     //Now we need to compare if we have a TPC that we stopped in with whether we wanted to stop in a TPC at all
-    if (validtpc) {
+    if (tpcid.isValid) {
       //The particle DID stop in a TPC.  Now, did we WANT this to happen
-      if (demand == 1)
-        return true; //We DID want this to happen
-      else
-        return false;
+      return demand == 1;
     }
     else {
       //The particle did NOT stop in a TPC.  Did we WANT this to happen?
-      if (demand == 2)
-        return true; //We DID want this to happen
-      else
-        return false;
+      return demand == 2;
     }
 
     //Assume true by default

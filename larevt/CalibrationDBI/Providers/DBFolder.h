@@ -12,7 +12,7 @@
 
 namespace lariov {
 
-  using Dataseet = void*;
+  using Dataset = void*;
   using Tuple = void*;
 
   class DBFolder {

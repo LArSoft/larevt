@@ -50,6 +50,7 @@
 
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
+#include "larevt/CalibrationDBI/Providers/WebError.h"
 #include <memory>
 #include <string>
 #include <variant>

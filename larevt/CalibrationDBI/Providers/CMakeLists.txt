@@ -2,7 +2,6 @@ cet_make_library(
   SOURCE
   DBDataset.cxx
   DBFolder.cxx
-  DatabaseRetrievalAlg.cxx
   DetPedestalRetrievalAlg.cxx
   SIOVChannelStatusProvider.cxx
   SIOVElectronicsCalibProvider.cxx

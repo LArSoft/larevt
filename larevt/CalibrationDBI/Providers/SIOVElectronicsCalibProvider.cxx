@@ -41,10 +41,9 @@ namespace lariov {
       auto const default_st = p.get<float>("DefaultShapingTime");
       auto const default_st_err = p.get<float>("DefaultShapingTimeErr");
 
-      art::ServiceHandle<geo::Geometry const> geo; // FIXME: Cannot use services in provider.
-      geo::wire_id_iterator itW = geo->begin_wire_id();
-      for (; itW != geo->end_wire_id(); ++itW) {
-        ElectronicsCalib defaultCalib{geo->PlaneWireToChannel(*itW),
+      art::ServiceHandle<geo::Geometry const> geo; // FIXME: Should not use services in provider.
+      for (auto const& id: geo->Iterate<geo::WireID>()){ 
+        ElectronicsCalib defaultCalib{geo->PlaneWireToChannel(id),
                                       default_gain,
                                       default_gain_err,
                                       default_st,
