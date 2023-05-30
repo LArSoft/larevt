@@ -184,6 +184,7 @@ namespace lariov {
       ChannelStatus cs{rawToDBChannel(ch), kNOISY};
       snapshot.AddOrReplaceRow(cs);
     }
+    fNewNoisy.drop_unused();
     fNewNoisy.emplace(ts, std::move(snapshot));
   }
 
