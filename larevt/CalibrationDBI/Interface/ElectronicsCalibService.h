@@ -44,6 +44,6 @@ namespace lariov {
   }; // class ElectronicsCalibService
 } // namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE(lariov::ElectronicsCalibService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(lariov::ElectronicsCalibService, SHARED)
 
 #endif

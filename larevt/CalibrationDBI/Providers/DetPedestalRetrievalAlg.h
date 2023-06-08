@@ -95,7 +95,6 @@ namespace lariov {
 
     DataSource::ds fDataSource;
     mutable cache_t fData;
-    const DetPedestal& Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const;
   };
 } //end namespace lariov
 

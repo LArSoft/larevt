@@ -15,12 +15,12 @@ namespace lariov {
   //but dont want to break existing configurations
   SIOVElectronicsCalibProvider::SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p)
     : fDBFolder(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
-    , fEventTimeStamp(0)
-    , fCurrentTimeStamp(0)
   {
+
+    Snapshot<ElectronicsCalib> snapshot;
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp() - 1, tmp.SubStamp());
-    fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
+    snapshot.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
 
     bool UseDB = p.get<bool>("UseDB", false);
     bool UseFile = p.get<bool>("UseFile", false);
@@ -35,6 +35,11 @@ namespace lariov {
     else
       fDataSource = DataSource::Default;
 
+    if (fDataSource == DataSource::Database) {
+      std::cout << "Using electronics calibrations from conditions database" << std::endl;
+      return;
+    }
+
     if (fDataSource == DataSource::Default) {
       auto const default_gain = p.get<float>("DefaultGain");
       auto const default_gain_err = p.get<float>("DefaultGainErr");
@@ -42,13 +47,10 @@ namespace lariov {
       auto const default_st_err = p.get<float>("DefaultShapingTimeErr");
 
       art::ServiceHandle<geo::Geometry const> geo; // FIXME: Should not use services in provider.
-      for (auto const& id: geo->Iterate<geo::WireID>()){ 
-        ElectronicsCalib defaultCalib{geo->PlaneWireToChannel(id),
-                                      default_gain,
-                                      default_gain_err,
-                                      default_st,
-                                      default_st_err};
-        fData.AddOrReplaceRow(defaultCalib);
+      for (auto const& id : geo->Iterate<geo::WireID>()) {
+        ElectronicsCalib defaultCalib{
+          geo->PlaneWireToChannel(id), default_gain, default_gain_err, default_st, default_st_err};
+        snapshot.AddOrReplaceRow(defaultCalib);
       }
     }
     else if (fDataSource == DataSource::File) {
@@ -80,34 +82,23 @@ namespace lariov {
         float shaping_time_err = std::stof(line.substr(current_comma + 1));
 
         ElectronicsCalib dp{ch, gain, gain_err, shaping_time, shaping_time_err};
-        fData.AddOrReplaceRow(dp);
+        snapshot.AddOrReplaceRow(dp);
       }
     }
-    else {
-      std::cout << "Using electronics calibrations from conditions database" << std::endl;
-    }
-  }
-
-  // This method saves the time stamp of the latest event.
-
-  void SIOVElectronicsCalibProvider::UpdateTimeStamp(DBTimeStamp_t ts)
-  {
-    mf::LogInfo("SIOVElectronicsCalibProvider")
-      << "SIOVElectronicsCalibProvider::UpdateTimeStamp called.";
-    fEventTimeStamp = ts;
+    fData.emplace(0, std::move(snapshot));
   }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  Snapshot<ElectronicsCalib> const& SIOVElectronicsCalibProvider::DBUpdate(DBTimeStamp_t ts) const
+  SIOVElectronicsCalibProvider::handle_t SIOVElectronicsCalibProvider::DBUpdate(
+    DBTimeStamp_t ts) const
   {
-    if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) { return fData; }
+    if (fDataSource != DataSource::Database) { return fData.at(0); }
+    if (auto h = fData.at(ts)) { return h; }
 
     mf::LogInfo("SIOVElectronicsCalibProvider")
       << "SIOVElectronicsCalibProvider::DBUpdate called with new timestamp.";
-
-    fCurrentTimeStamp = ts;
 
     auto const dataset = fDBFolder.GetDataset(ts);
 
@@ -120,39 +111,40 @@ namespace lariov {
                           dataset.GetDataAsFloat(channel, "shaping_time_err")};
       data.AddOrReplaceRow(pg);
     }
-
-    return fData = data;
+    //MT note: there may be  a better place for this cleanup call
+    fData.drop_unused();
+    return fData.emplace(ts, data);
   }
 
-  const ElectronicsCalib& SIOVElectronicsCalibProvider::ElectronicsCalibObject(
-    DBChannelID_t ch) const
+  float SIOVElectronicsCalibProvider::Gain(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return DBUpdate(fEventTimeStamp).GetRow(ch);
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).Gain();
   }
 
-  float SIOVElectronicsCalibProvider::Gain(DBChannelID_t ch) const
+  float SIOVElectronicsCalibProvider::GainErr(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return ElectronicsCalibObject(ch).Gain();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).GainErr();
   }
 
-  float SIOVElectronicsCalibProvider::GainErr(DBChannelID_t ch) const
+  float SIOVElectronicsCalibProvider::ShapingTime(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return ElectronicsCalibObject(ch).GainErr();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).ShapingTime();
   }
 
-  float SIOVElectronicsCalibProvider::ShapingTime(DBChannelID_t ch) const
+  float SIOVElectronicsCalibProvider::ShapingTimeErr(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return ElectronicsCalibObject(ch).ShapingTime();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).ShapingTimeErr();
   }
 
-  float SIOVElectronicsCalibProvider::ShapingTimeErr(DBChannelID_t ch) const
+  CalibrationExtraInfo const& SIOVElectronicsCalibProvider::ExtraInfo(DBTimeStamp_t ts,
+                                                                      DBChannelID_t ch) const
   {
-    return ElectronicsCalibObject(ch).ShapingTimeErr();
-  }
-
-  CalibrationExtraInfo const& SIOVElectronicsCalibProvider::ExtraInfo(DBChannelID_t ch) const
-  {
-    return ElectronicsCalibObject(ch).ExtraInfo();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).ExtraInfo();
   }
 
 } //end namespace lariov

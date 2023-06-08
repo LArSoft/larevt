@@ -28,12 +28,12 @@ namespace lariov {
     virtual ~ElectronicsCalibProvider() = default;
 
     /// Retrieve pmt gain information
-    virtual float Gain(raw::ChannelID_t ch) const = 0;
-    virtual float GainErr(raw::ChannelID_t ch) const = 0;
-    virtual float ShapingTime(raw::ChannelID_t ch) const = 0;
-    virtual float ShapingTimeErr(raw::ChannelID_t ch) const = 0;
+    virtual float Gain(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
+    virtual float GainErr(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
+    virtual float ShapingTime(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
+    virtual float ShapingTimeErr(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
 
-    virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
+    virtual CalibrationExtraInfo const& ExtraInfo(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
   };
 } //end namespace lariov
 

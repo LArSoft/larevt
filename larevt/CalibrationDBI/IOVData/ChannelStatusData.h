@@ -4,8 +4,8 @@
 #include <memory>
 #include <set>
 
-#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
+#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 
 namespace lariov {
 

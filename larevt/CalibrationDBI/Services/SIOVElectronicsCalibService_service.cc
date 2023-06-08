@@ -1,7 +1,4 @@
-#include "art/Framework/Principal/Event.h"
-#include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
-#include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/ElectronicsCalibService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVElectronicsCalibProvider.h"
@@ -17,13 +14,7 @@ namespace lariov {
   class SIOVElectronicsCalibService : public ElectronicsCalibService {
 
   public:
-    SIOVElectronicsCalibService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
-    ~SIOVElectronicsCalibService() {}
-
-    void PreProcessEvent(const art::Event& evt, art::ScheduleContext)
-    {
-      fProvider.UpdateTimeStamp(evt.time().value());
-    }
+    SIOVElectronicsCalibService(fhicl::ParameterSet const& pset);
 
   private:
     ElectronicsCalibProvider const& DoGetProvider() const override { return fProvider; }
@@ -36,17 +27,13 @@ namespace lariov {
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVElectronicsCalibService,
                                    lariov::ElectronicsCalibService,
-                                   LEGACY)
+                                   SHARED)
 
 namespace lariov {
 
-  SIOVElectronicsCalibService::SIOVElectronicsCalibService(fhicl::ParameterSet const& pset,
-                                                           art::ActivityRegistry& reg)
+  SIOVElectronicsCalibService::SIOVElectronicsCalibService(fhicl::ParameterSet const& pset)
     : fProvider(pset.get<fhicl::ParameterSet>("ElectronicsCalibProvider"))
-  {
-    //register callback to update local database cache before each event is processed
-    reg.sPreProcessEvent.watch(this, &SIOVElectronicsCalibService::PreProcessEvent);
-  }
+  {}
 
 } //end namespace lariov
 

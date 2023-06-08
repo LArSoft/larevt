@@ -12,6 +12,7 @@
 #define SIOVELECTRONICSCALIBPROVIDER_H
 
 #include "DBFolder.h"
+#include "hep_concurrency/cache.h"
 #include "larevt/CalibrationDBI/IOVData/ElectronicsCalib.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
@@ -45,32 +46,27 @@ namespace lariov {
     /// Constructors
     SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p);
 
-    /// Update event time stamp.
-    void UpdateTimeStamp(DBTimeStamp_t ts);
-
     /// Retrieve electronics calibration information
-    const ElectronicsCalib& ElectronicsCalibObject(DBChannelID_t ch) const;
-    float Gain(DBChannelID_t ch) const override;
-    float GainErr(DBChannelID_t ch) const override;
-    float ShapingTime(DBChannelID_t ch) const override;
-    float ShapingTimeErr(DBChannelID_t ch) const override;
-    CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
+    float Gain(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    float GainErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    float ShapingTime(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    float ShapingTimeErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    CalibrationExtraInfo const& ExtraInfo(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+
+    using cache_t = hep::concurrency::cache<DBTimeStamp_t, Snapshot<ElectronicsCalib>>;
+    using handle_t = cache_t::handle;
 
   private:
     /// Do actual database updates.
 
-    Snapshot<ElectronicsCalib> const& DBUpdate(DBTimeStamp_t ts) const;
+    handle_t DBUpdate(DBTimeStamp_t ts) const;
 
     DBFolder fDBFolder;
 
     // Time stamps.
 
-    DBTimeStamp_t fEventTimeStamp;           // Most recently seen time stamp.
-    mutable DBTimeStamp_t fCurrentTimeStamp; // Time stamp of cached data.
-
     DataSource::ds fDataSource;
-
-    mutable Snapshot<ElectronicsCalib> fData;
+    mutable cache_t fData;
   };
 } //end namespace lariov
 

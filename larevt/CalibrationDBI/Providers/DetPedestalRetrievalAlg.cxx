@@ -131,34 +131,33 @@ namespace lariov {
                      dataset.GetDataAsFloat(channel, "rms_err")};
       data.AddOrReplaceRow(pd);
     }
-    //SS: there may be  a better place for this cleanup call
+    //MT note: there may be  a better place for this cleanup call
     fData.drop_unused();
     return fData.emplace(ts, data);
   }
 
-  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const
-  {
-    return DBUpdate(ts)->GetRow(ch);
-  }
-
   float DetPedestalRetrievalAlg::PedMean(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ts, ch).PedMean();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).PedMean();
   }
 
   float DetPedestalRetrievalAlg::PedRms(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ts, ch).PedRms();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).PedRms();
   }
 
   float DetPedestalRetrievalAlg::PedMeanErr(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ts, ch).PedMeanErr();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).PedMeanErr();
   }
 
   float DetPedestalRetrievalAlg::PedRmsErr(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ts, ch).PedRmsErr();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).PedRmsErr();
   }
 
 } //end namespace lariov
