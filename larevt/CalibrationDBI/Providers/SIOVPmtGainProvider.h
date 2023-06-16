@@ -12,6 +12,7 @@
 #define SIOVPMTGAINPROVIDER_H
 
 #include "DBFolder.h"
+#include "hep_concurrency/cache.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/IOVData/PmtGain.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
@@ -41,30 +42,24 @@ namespace lariov {
     /// Constructors
     SIOVPmtGainProvider(fhicl::ParameterSet const& p);
 
-    /// Update event time stamp.
-    void UpdateTimeStamp(DBTimeStamp_t ts);
+    float Gain(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    float GainErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    CalibrationExtraInfo const& ExtraInfo(DBTimeStamp_t ts, DBChannelID_t ch) const override;
 
-    /// Retrieve gain information
-    const PmtGain& PmtGainObject(DBChannelID_t ch) const;
-    float Gain(DBChannelID_t ch) const override;
-    float GainErr(DBChannelID_t ch) const override;
-    CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
+    using cache_t = hep::concurrency::cache<DBTimeStamp_t, Snapshot<PmtGain>>;
+    using handle_t = cache_t::handle;
 
   private:
     /// Do actual database updates.
-
-    Snapshot<PmtGain> const& DBUpdate(DBTimeStamp_t ts) const;
+    handle_t DBUpdate(DBTimeStamp_t ts) const;
 
     DBFolder fDBFolder;
 
     // Time stamps.
 
-    DBTimeStamp_t fEventTimeStamp;           // Most recently seen time stamp.
-    mutable DBTimeStamp_t fCurrentTimeStamp; // Time stamp of cached data.
-
     DataSource::ds fDataSource;
 
-    mutable Snapshot<PmtGain> fData;
+    mutable cache_t fData;
   };
 } //end namespace lariov
 

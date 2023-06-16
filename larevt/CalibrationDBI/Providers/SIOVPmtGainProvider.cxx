@@ -13,12 +13,7 @@ namespace lariov {
   //constructor
   SIOVPmtGainProvider::SIOVPmtGainProvider(fhicl::ParameterSet const& p)
     : fDBFolder(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
-    , fEventTimeStamp(0)
-    , fCurrentTimeStamp(0)
   {
-    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
-    tmp.SetStamp(tmp.Stamp() - 1, tmp.SubStamp());
-    fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
 
     bool UseDB = p.get<bool>("UseDB", false);
     bool UseFile = p.get<bool>("UseFile", false);
@@ -33,6 +28,16 @@ namespace lariov {
     else
       fDataSource = DataSource::Default;
 
+    if (fDataSource == DataSource::Database) {
+      std::cout << "Using pmt gains from conditions database" << std::endl;
+      return;
+    }
+
+    Snapshot<PmtGain> snapshot;
+    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
+    tmp.SetStamp(tmp.Stamp() - 1, tmp.SubStamp());
+    snapshot.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
+
     if (fDataSource == DataSource::Default) {
       auto const default_gain = p.get<float>("DefaultGain");
       auto const default_gain_err = p.get<float>("DefaultGainErr");
@@ -41,7 +46,7 @@ namespace lariov {
       for (unsigned int od = 0; od != geo->NOpDets(); ++od) {
         if (geo->IsValidOpChannel(od)) {
           PmtGain defaultGain{od, default_gain, default_gain_err};
-          fData.AddOrReplaceRow(defaultGain);
+          snapshot.AddOrReplaceRow(defaultGain);
         }
       }
     }
@@ -66,33 +71,22 @@ namespace lariov {
         float gain_err = std::stof(line.substr(current_comma + 1));
 
         PmtGain dp{ch, gain, gain_err};
-        fData.AddOrReplaceRow(dp);
+        snapshot.AddOrReplaceRow(dp);
       }
     }
-    else {
-      std::cout << "Using pmt gains from conditions database" << std::endl;
-    }
-  }
-
-  // This method saves the time stamp of the latest event.
-
-  void SIOVPmtGainProvider::UpdateTimeStamp(DBTimeStamp_t ts)
-  {
-    mf::LogInfo("SIOVPmtGainProvider") << "SIOVPmtGainProvider::UpdateTimeStamp called.";
-    fEventTimeStamp = ts;
+    fData.emplace(0, std::move(snapshot));
   }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  Snapshot<PmtGain> const& SIOVPmtGainProvider::DBUpdate(DBTimeStamp_t ts) const
+  SIOVPmtGainProvider::handle_t SIOVPmtGainProvider::DBUpdate(DBTimeStamp_t ts) const
   {
-    if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) { return fData; }
+    if (fDataSource != DataSource::Database) { return fData.at(0); }
+    if (auto h = fData.at(ts)) { return h; }
 
     mf::LogInfo("SIOVPmtGainProvider")
       << "SIOVPmtGainProvider::DBUpdate called with new timestamp.";
-
-    fCurrentTimeStamp = ts;
 
     auto const dataset = fDBFolder.GetDataset(ts);
 
@@ -104,21 +98,28 @@ namespace lariov {
       data.AddOrReplaceRow(pg);
     }
 
-    return fData = data;
+    //MT note: there may be  a better place for this cleanup call
+    fData.drop_unused();
+    return fData.emplace(ts, data);
   }
 
-  const PmtGain& SIOVPmtGainProvider::PmtGainObject(DBChannelID_t ch) const
+  float SIOVPmtGainProvider::Gain(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return DBUpdate(fEventTimeStamp).GetRow(ch);
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).Gain();
   }
 
-  float SIOVPmtGainProvider::Gain(DBChannelID_t ch) const { return PmtGainObject(ch).Gain(); }
-
-  float SIOVPmtGainProvider::GainErr(DBChannelID_t ch) const { return PmtGainObject(ch).GainErr(); }
-
-  CalibrationExtraInfo const& SIOVPmtGainProvider::ExtraInfo(DBChannelID_t ch) const
+  float SIOVPmtGainProvider::GainErr(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return PmtGainObject(ch).ExtraInfo();
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).GainErr();
+  }
+
+  CalibrationExtraInfo const& SIOVPmtGainProvider::ExtraInfo(DBTimeStamp_t ts,
+                                                             DBChannelID_t ch) const
+  {
+    auto dbHandle = DBUpdate(ts);
+    return dbHandle->GetRow(ch).ExtraInfo();
   }
 
 } //end namespace lariov

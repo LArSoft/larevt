@@ -12,6 +12,7 @@
 #include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larevt/CalibrationDBI/IOVData/CalibrationExtraInfo.h"
+#include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
 namespace lariov {
 
@@ -27,10 +28,10 @@ namespace lariov {
     virtual ~PmtGainProvider() = default;
 
     /// Retrieve pmt gain information
-    virtual float Gain(raw::ChannelID_t ch) const = 0;
-    virtual float GainErr(raw::ChannelID_t ch) const = 0;
+    virtual float Gain(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
+    virtual float GainErr(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
 
-    virtual CalibrationExtraInfo const& ExtraInfo(raw::ChannelID_t ch) const = 0;
+    virtual CalibrationExtraInfo const& ExtraInfo(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
   };
 } //end namespace lariov
 
