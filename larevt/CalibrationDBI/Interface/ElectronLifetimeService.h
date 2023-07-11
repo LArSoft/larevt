@@ -28,6 +28,6 @@ namespace lariov {
   };
 } //end namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE(lariov::ElectronLifetimeService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(lariov::ElectronLifetimeService, SHARED)
 
 #endif
