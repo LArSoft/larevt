@@ -307,9 +307,6 @@ namespace caldata {
       // TMath::Mean with iterators doesn't work. EC,23-Sep-2010.
       double tmp = TMath::Mean(winDiffs.size(), &winDiffs[0]);
       double tmp2 = TMath::RMS(winDiffs.size(), &winDiffs[0]);
-      double tmp3 = 0;
-      for (unsigned int ii = 0; ii < rdvec[rd]->Samples(); ii++)
-        tmp3 += rdvec[rd]->ADC(ii);
       for (int i = 0; i < fft->FFTSize(); i++) {
         fIR->Fill(i, ir[i]);
         fIW->Fill(i, iw[i]);

@@ -269,7 +269,7 @@ namespace caldata {
       wirecol->push_back(recob::WireCreator(holder, *digitVec).move());
       // add an association between the last object in wirecol
       // (that we just inserted) and digitVec
-      if (!util::CreateAssn(*this, evt, *wirecol, digitVec, *WireDigitAssn)) {
+      if (!util::CreateAssn(evt, *wirecol, digitVec, *WireDigitAssn)) {
         throw art::Exception(art::errors::ProductRegistrationFailure)
           << "Can't associate wire #" << (wirecol->size() - 1) << " with raw digit #"
           << digitVec.key();
