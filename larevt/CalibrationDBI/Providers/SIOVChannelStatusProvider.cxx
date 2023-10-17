@@ -13,7 +13,6 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
@@ -25,12 +24,12 @@ namespace lariov {
   /// Converts LArSoft channel ID in the one proper for the DB
   static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel) { return DBChannelID_t(channel); }
 
-  class SIOVChannelStatusData : public ChannelStatusData {
+  class SIOVChannelStatusForTimestamp {
   public:
-    SIOVChannelStatusData() = default;
-    SIOVChannelStatusData(SIOVChannelStatusProvider::handle_t noisy,
-                          SIOVChannelStatusProvider::handle_t dbdata)
-      : fNoisyData(noisy), fDBdata(dbdata), fUseDefault(fNoisyData && fDBdata)
+    SIOVChannelStatusForTimestamp() = default;
+    SIOVChannelStatusForTimestamp(SIOVChannelStatusProvider::handle_t noisy,
+                                  SIOVChannelStatusProvider::handle_t dbdata)
+      : fNoisyData(noisy), fDBdata(dbdata), fUseDefault(!fNoisyData || !fDBdata)
     {}
 
     ChannelStatus GetChannelStatus(raw::ChannelID_t ch) const
@@ -117,9 +116,36 @@ namespace lariov {
       std::cout << "Using channel statuses from conditions database\n";
     }
   }
-  // Maybe update method cached data (private const version).
-  // This is the function that does the actual work of updating data from database.
 
+  bool SIOVChannelStatusProvider::IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const
+  {
+    auto data = GetData(ts);
+    return data->GetChannelStatus(channel).IsPresent();
+  }
+
+  /// Returns whether the specified channel is bad in the current run
+  bool SIOVChannelStatusProvider::IsBad(DBTimeStamp_t ts, raw::ChannelID_t channel) const
+  {
+    auto data = GetData(ts);
+    auto status = data->GetChannelStatus(channel);
+    return status.IsDead() || status.IsLowNoise() || !status.IsPresent();
+  }
+
+  /// Returns whether the specified channel is noisy in the current run
+  bool SIOVChannelStatusProvider::IsNoisy(DBTimeStamp_t ts, raw::ChannelID_t channel) const
+  {
+    auto data = GetData(ts);
+    return data->GetChannelStatus(channel).IsNoisy();
+  }
+
+  /// Returns whether the specified channel is physical and good
+  bool SIOVChannelStatusProvider::IsGood(DBTimeStamp_t ts, raw::ChannelID_t channel) const
+  {
+    auto data = GetData(ts);
+    return data->GetChannelStatus(channel).IsGood();
+  }
+
+  // This is the function that does the actual work of updating data from database.
   SIOVChannelStatusProvider::handle_t SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const
   {
     if (fDataSource != DataSource::Database) { return fData.at(0); }
@@ -148,10 +174,11 @@ namespace lariov {
     return fNewNoisy.at(ts);
   }
 
-  ChannelStatusDataPtr SIOVChannelStatusProvider::GetData(DBTimeStamp_t ts) const
+  SIOVChannelStatusForTimestampPtr SIOVChannelStatusProvider::GetData(DBTimeStamp_t ts) const
   {
-    if (fDataSource == DataSource::Default) return std::make_shared<SIOVChannelStatusData>();
-    return std::make_shared<SIOVChannelStatusData>(GetNoisyData(ts), DBUpdate(ts));
+    if (fDataSource == DataSource::Default)
+      return std::make_shared<SIOVChannelStatusForTimestamp>();
+    return std::make_shared<SIOVChannelStatusForTimestamp>(GetNoisyData(ts), DBUpdate(ts));
   }
 
   //----------------------------------------------------------------------------
@@ -190,4 +217,9 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
 
+  chStatus SIOVChannelStatusProvider::Status(DBTimeStamp_t ts, raw::ChannelID_t ch) const
+  {
+    auto data = GetData(ts);
+    return data->GetChannelStatus(ch).Status();
+  }
 } // namespace lariov

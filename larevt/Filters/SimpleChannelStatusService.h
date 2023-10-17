@@ -12,16 +12,13 @@
 #define SIMPLECHANNELFILTERSERVICE_H
 
 // LArSoft libraries
+#include "art/Framework/Principal/fwd.h"
 #include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/Filters/SimpleChannelStatus.h"
 
 // C/C++ standard libraries
 #include <memory> //std::unique_ptr<>
-
-namespace art {
-  class Run;
-} // namespace art
 
 namespace lariov {
 
@@ -50,8 +47,7 @@ namespace lariov {
     SimpleChannelStatusService(fhicl::ParameterSet const& pset);
 
   private:
-    virtual ChannelStatusProvider const& DoGetProvider() const override { return fProvider; }
-    virtual ChannelStatusProvider const* DoGetProviderPtr() const override { return &fProvider; }
+    ChannelStatusDataPtr DataFor(art::Event const& evt) const override;
     raw::ChannelID_t fMaxChannel;
     SimpleChannelStatus fProvider;
 

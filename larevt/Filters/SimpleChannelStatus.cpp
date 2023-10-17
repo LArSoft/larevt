@@ -100,4 +100,11 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
 
+  chStatus SimpleChannelStatus::Status(DBTimeStamp_t ts, raw::ChannelID_t ch) const
+  {
+    if (!IsPresent(ts, ch)) return kUNKNOWN;
+    if (IsGood(ts, ch)) return kGOOD;
+    if (IsNoisy(ts, ch)) return kNOISY;
+    return kUNKNOWN;
+  }
 } // namespace filter

@@ -151,8 +151,8 @@ namespace caldata {
 
     // loop over the raw digits and get the adc vector for each, then compress it and uncompress it
 
-    lariov::ChannelStatusProvider const& channelStatus =
-      art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider();
+    auto const channelStatus =
+      art::ServiceHandle<lariov::ChannelStatusService const>()->DataFor(evt);
     art::Handle<std::vector<raw::RawDigit>> rdHandle;
     evt.getByLabel(fDetSimModuleLabel, rdHandle);
     art::Handle<std::vector<recob::Wire>> wHandle;
@@ -219,7 +219,7 @@ namespace caldata {
       }
       //get the last one for the adc vector
       adc[rdvec[rd]->Samples() - 1] = rdvec[rd]->ADC(rdvec[rd]->Samples() - 1);
-      if (!channelStatus.IsBad(evt.time().value(), rdvec[rd]->Channel()) &&
+      if (!channelStatus->IsBad(rdvec[rd]->Channel()) &&
           (*max_element(adc.begin(), adc.end()) < pedestal + threshold &&
            *min_element(adc.begin(), adc.end()) > pedestal - threshold)) {
         double sum = 0;

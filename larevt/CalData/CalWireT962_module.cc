@@ -199,8 +199,8 @@ namespace caldata {
     raw::ChannelID_t channel = raw::InvalidChannelID; // channel number
     unsigned int bin(0);                              // time bin loop variable
 
-    lariov::ChannelStatusProvider const& channelStatus =
-      art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider();
+    auto const channelStatus =
+      art::ServiceHandle<lariov::ChannelStatusService const>()->DataFor(evt);
 
     double decayConst = 0.;   // exponential decay constant of electronics shaping
     double fitAmplitude = 0.; //This is the seed value for the amplitude in the exponential tail fit
@@ -218,7 +218,7 @@ namespace caldata {
       channel = digitVec->Channel();
 
       // skip bad channels
-      if (!channelStatus.IsBad(evt.time().value(), channel)) {
+      if (!channelStatus->IsBad(channel)) {
         holder.resize(transformSize);
 
         for (bin = 0; bin < dataSize; ++bin)

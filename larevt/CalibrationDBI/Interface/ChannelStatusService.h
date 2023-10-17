@@ -13,10 +13,10 @@
 #define CHANNELSTATUSSERVICE_H
 
 // LArSoft libraries
-#include "larcore/CoreUtils/ServiceUtil.h" // ServiceRequirementsChecker<>
-#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
 
 // Framework libraries
+#include "art/Framework/Principal/fwd.h"
 #include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 
 //forward declarations
@@ -64,57 +64,13 @@ namespace lariov {
    *
    */
   class ChannelStatusService {
-
   public:
-    using provider_type = ChannelStatusProvider;
-
-    /// Destructor
     virtual ~ChannelStatusService() = default;
-
-    //
-    // Actual interface here
-    //
-
-    //@{
-    /// Returns a reference to the service provider
-    ChannelStatusProvider const& GetProvider() const { return DoGetProvider(); }
-    // will be deprecated:
-    [[deprecated("use GetProvider instead")]] ChannelStatusProvider const& GetFilter() const
-    {
-      return GetProvider();
-    }
-    //@}
-
-    //@{
-    /// Returns a pointer to the service provider
-    ChannelStatusProvider const* GetProviderPtr() const { return DoGetProviderPtr(); }
-    // will be deprecated:
-    [[deprecated("use GetProviderPtr")]] ChannelStatusProvider const* GetFilterPtr() const
-    {
-      return GetProviderPtr();
-    }
-    //@}
-
-    ChannelStatusProvider const* provider() const { return GetProviderPtr(); }
-
-    //
-    // end of interface
-    //
-
-  private:
-    /// Returns a pointer to the service provider
-    virtual ChannelStatusProvider const* DoGetProviderPtr() const = 0;
-
-    /// Returns a reference to the service provider
-    virtual ChannelStatusProvider const& DoGetProvider() const = 0;
-
+    virtual ChannelStatusDataPtr DataFor(art::Event const& evt) const = 0;
   }; // class ChannelStatusService
 
 } // namespace lariov
 
 DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, SHARED)
-
-// check that the requirements for lariov::ChannelStatusService are satisfied
-template struct lar::details::ServiceRequirementsChecker<lariov::ChannelStatusService>;
 
 #endif // CHANNELSTATUSSERVICE_H

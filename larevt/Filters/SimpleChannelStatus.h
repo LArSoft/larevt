@@ -102,6 +102,8 @@ namespace lariov {
     /// Returns the ID of the largest present channel
     raw::ChannelID_t MaxChannelPresent() const { return fMaxPresentChannel; }
 
+    chStatus Status(DBTimeStamp_t ts, raw::ChannelID_t channel) const override;
+
   protected:
     const raw::ChannelID_t fMaxChannel;        ///< largest ID among existing channels
     const raw::ChannelID_t fMaxPresentChannel; ///< largest ID among present channels

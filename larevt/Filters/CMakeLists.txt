@@ -2,7 +2,6 @@ include(lar::CalibrationDBIServiceBuilders)
 
 cet_make_library(
   SOURCE
-  ChannelFilter.cxx
   SimpleChannelStatus.cpp
   LIBRARIES
   PUBLIC
@@ -67,6 +66,7 @@ cet_build_plugin(SimpleChannelStatusService lar::ChannelStatusService
   PUBLIC
   larevt::Filters
   PRIVATE
+  art::Framework_Principal
   larcore::Geometry_Geometry_service
   messagefacility::MF_MessageLogger
 )

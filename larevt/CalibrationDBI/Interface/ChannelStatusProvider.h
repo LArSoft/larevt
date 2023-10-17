@@ -16,17 +16,17 @@
 #define CHANNELSTATUSPROVIDER_H 1
 
 // C/C++ standard libraries
-#include <limits> // std::numeric_limits<>
 #include <set>
 
 // LArSoft libraries
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-#include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
+#include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
 /// Filters for channels, events, etc
 namespace lariov {
 
+  using ChannelSet_t = std::set<raw::ChannelID_t>;
   /** **************************************************************************
    * @brief Class providing information about the quality of channels
    *
@@ -48,11 +48,6 @@ namespace lariov {
   class ChannelStatusProvider {
 
   public:
-    using Status_t = unsigned short; ///< type representing channel status
-
-    /// Value or invalid status
-    static constexpr Status_t InvalidStatus = std::numeric_limits<Status_t>::max();
-
     /// Default constructor
     ChannelStatusProvider() = default;
 
@@ -64,8 +59,6 @@ namespace lariov {
 
     /// Virtual destructor; destructs nothing
     virtual ~ChannelStatusProvider() = default;
-
-    //virtual ChannelStatusDataPtr DataFor(DBTimeStamp_t ts) const = 0;
 
     /// Returns whether the specified channel is physical and connected to wire
     virtual bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const = 0;
@@ -83,10 +76,7 @@ namespace lariov {
     }
 
     /// Returns a status integer with arbitrary meaning
-    virtual Status_t Status(DBTimeStamp_t ts, raw::ChannelID_t channel) const
-    {
-      return InvalidStatus;
-    }
+    virtual chStatus Status(DBTimeStamp_t ts, raw::ChannelID_t channel) const { return kUNKNOWN; }
 
     /// Returns whether the specified status is a valid one
     virtual bool HasStatus(DBTimeStamp_t ts, raw::ChannelID_t channel) const
@@ -104,7 +94,7 @@ namespace lariov {
     virtual ChannelSet_t NoisyChannels(DBTimeStamp_t ts) const = 0;
 
     /// Returns whether the specified status is a valid one
-    static bool IsValidStatus(Status_t status) { return status != InvalidStatus; }
+    static bool IsValidStatus(chStatus status) { return status != kUNKNOWN; }
 
   }; // class ChannelStatusProvider
 

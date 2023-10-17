@@ -12,7 +12,6 @@
 // LArSoft libraries
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
-#include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
@@ -28,6 +27,8 @@ namespace fhicl {
 
 /// Filters for channels, events, etc
 namespace lariov {
+  class SIOVChannelStatusForTimestamp;
+  using SIOVChannelStatusForTimestampPtr = std::shared_ptr<SIOVChannelStatusForTimestamp>;
 
   /** **************************************************************************
    * @brief Class providing information about the quality of channels
@@ -49,32 +50,16 @@ namespace lariov {
     /// @name Single channel queries
     /// @{
     /// Returns whether the specified channel is physical and connected to wire
-    bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const override
-    {
-      auto data = GetData(ts);
-      return data->IsPresent(channel);
-    }
+    bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const override;
 
     /// Returns whether the specified channel is bad in the current run
-    bool IsBad(DBTimeStamp_t ts, raw::ChannelID_t channel) const override
-    {
-      auto data = GetData(ts);
-      return data->IsDead(channel) || data->IsLowNoise(channel) || !data->IsPresent(channel);
-    }
+    bool IsBad(DBTimeStamp_t ts, raw::ChannelID_t channel) const override;
 
     /// Returns whether the specified channel is noisy in the current run
-    bool IsNoisy(DBTimeStamp_t ts, raw::ChannelID_t channel) const override
-    {
-      auto data = GetData(ts);
-      return data->IsNoisy(channel);
-    }
+    bool IsNoisy(DBTimeStamp_t ts, raw::ChannelID_t channel) const override;
 
     /// Returns whether the specified channel is physical and good
-    bool IsGood(DBTimeStamp_t ts, raw::ChannelID_t channel) const override
-    {
-      auto data = GetData(ts);
-      return data->IsGood(channel);
-    }
+    bool IsGood(DBTimeStamp_t ts, raw::ChannelID_t channel) const override;
     /// @}
 
     /// @name Global channel queries
@@ -91,7 +76,7 @@ namespace lariov {
 
     /// Allows a service to add to the list of noisy channels
     void AddNoisyChannels(DBTimeStamp_t ts, std::vector<raw::ChannelID_t> ch);
-
+    chStatus Status(DBTimeStamp_t ts, raw::ChannelID_t ch) const;
     ///@}
     using cache_t = hep::concurrency::cache<DBTimeStamp_t, Snapshot<ChannelStatus>>;
     using handle_t = cache_t::handle;
@@ -101,7 +86,7 @@ namespace lariov {
 
     handle_t DBUpdate(DBTimeStamp_t ts) const;
     handle_t GetNoisyData(DBTimeStamp_t ts) const;
-    ChannelStatusDataPtr GetData(DBTimeStamp_t ts) const;
+    SIOVChannelStatusForTimestampPtr GetData(DBTimeStamp_t ts) const;
 
     DBFolder fDBFolder;
     DataSource::ds fDataSource;
