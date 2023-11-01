@@ -12,7 +12,7 @@
 // LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Providers/DBFolder.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
@@ -154,10 +154,9 @@ namespace lariov {
   SIOVChannelStatusProvider::ChannelSet_t SIOVChannelStatusProvider::GetChannelsWithStatus(
     chStatus status) const
   {
-
     ChannelSet_t retSet;
     retSet.clear();
-    DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1;
+    DBChannelID_t maxChannel = art::ServiceHandle<geo::WireReadout const>()->Get().Nchannels() - 1;
     if (fDataSource == DataSource::Default) {
       if (fDefault.Status() == status) {
         std::vector<DBChannelID_t> chs;

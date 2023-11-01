@@ -4,7 +4,7 @@
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
  *
- * The schema is the same as for ExptGeoHelperInterface in Geometry library
+ * The schema is the same as for WireReadout in Geometry library
  * (larcore repository).
  * The implementations of this interface can be directly used as art services.
  */

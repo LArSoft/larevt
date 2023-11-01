@@ -3,7 +3,7 @@
 // art/LArSoft libraries
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "cetlib_except/exception.h"
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include <fstream>
@@ -16,7 +16,6 @@ namespace lariov {
     , fEventTimeStamp(0)
     , fCurrentTimeStamp(0)
   {
-
     this->Reconfigure(p);
   }
 
@@ -56,9 +55,9 @@ namespace lariov {
       defaultCalib.SetShapingTimeErr(default_st_err);
       defaultCalib.SetExtraInfo(CalibrationExtraInfo("ElectronicsCalib"));
 
-      art::ServiceHandle<geo::Geometry const> geo;
-      for (auto const& wid : geo->Iterate<geo::WireID>()) {
-        DBChannelID_t ch = geo->PlaneWireToChannel(wid);
+      auto const& wireReadoutGeom = art::ServiceHandle<geo::WireReadout const>()->Get();
+      for (auto const& wid : wireReadoutGeom.Iterate<geo::WireID>()) {
+        DBChannelID_t ch = wireReadoutGeom.PlaneWireToChannel(wid);
         defaultCalib.SetChannel(ch);
         fData.AddOrReplaceRow(defaultCalib);
       }

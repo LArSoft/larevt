@@ -24,7 +24,7 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // LArSoft includes
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/RecoBase/Wire.h"
@@ -45,12 +45,11 @@ namespace caldata {
   public:
     explicit CalWireAna(fhicl::ParameterSet const& pset);
 
-    /// read/write access to event
-    void analyze(const art::Event& evt);
-    void beginJob();
-    void endJob();
-
   private:
+    /// read/write access to event
+    void analyze(const art::Event& evt) override;
+    void beginJob() override;
+
     std::string fCalWireModuleLabel; ///< name of module that produced the wires
     std::string fDetSimModuleLabel;  //< name of module that produced the digits
 
@@ -138,17 +137,11 @@ namespace caldata {
     fCW = tfs->make<TH1F>("Wire Coll signal", "time ticks", 4096, 0.0, 4096.);
     fNoiseHist = tfs->make<TH1F>("Noise Histogram", "FFT Bins", 2049, 0, 2049);
     fNoiseRMS = tfs->make<TH1F>("Noise RMS", "RMS", 25, 0, 2.0);
-
-    return;
   }
-
-  //-------------------------------------------------
-  void CalWireAna::endJob() {}
 
   //-------------------------------------------------
   void CalWireAna::analyze(const art::Event& evt)
   {
-
     // loop over the raw digits and get the adc vector for each, then compress it and uncompress it
 
     lariov::ChannelStatusProvider const& channelStatus =
@@ -164,16 +157,13 @@ namespace caldata {
 
     art::PtrVector<recob::Wire> wvec;
     for (unsigned int i = 0; i < wHandle->size(); ++i) {
-      art::Ptr<recob::Wire> w(wHandle, i);
-      wvec.push_back(w);
+      wvec.emplace_back(wHandle, i);
     }
     art::PtrVector<raw::RawDigit> rdvec;
     for (unsigned int i = 0; i < rdHandle->size(); ++i) {
-      art::Ptr<raw::RawDigit> r(rdHandle, i);
-      rdvec.push_back(r);
+      rdvec.emplace_back(rdHandle, i);
     }
 
-    art::ServiceHandle<geo::Geometry const> geom;
     art::ServiceHandle<util::LArFFT> fft;
     double pedestal = rdvec[0]->GetPedestal();
     double threshold = 9.0;
@@ -186,11 +176,11 @@ namespace caldata {
       cw(fft->FFTSize());
     ir[signalSize] = iw[signalSize] = cr[signalSize] = cw[signalSize] = 1.0;
     /// loop over all the raw digits in a window around peak
+    auto const& wireReadoutGeom = art::ServiceHandle<geo::WireReadout const>()->Get();
     for (unsigned int rd = 0; rd < rdvec.size(); ++rd) {
       // Find corresponding wire.
       std::vector<double> signal(fft->FFTSize());
       for (unsigned int wd = 0; wd < wvec.size(); ++wd) {
-        //  if (wvec[wd]->RawDigit() == rdvec[rd]){
         if (RawDigitsFromWire.at(wd) == rdvec[rd]) {
           std::vector<float> wirSig = wvec[wd]->Signal();
           if (wirSig.size() > signal.size()) {
@@ -234,23 +224,23 @@ namespace caldata {
         for (int i = 0; i < fft->FFTSize() / 2 + 1; i++)
           fNoiseHist->Fill(i, fTemp[i].Rho());
       }
-      if (geom->SignalType(rdvec[rd]->Channel()) == geo::kInduction &&
+      if (wireReadoutGeom.SignalType(rdvec[rd]->Channel()) == geo::kInduction &&
           rdvec[rd]->Channel() > indChan0 && rdvec[rd]->Channel() < indChan1) {
         fft->AlignedSum(ir, adc);
         fft->AlignedSum(iw, signal);
       }
-      if (geom->SignalType(rdvec[rd]->Channel()) == geo::kCollection &&
+      if (wireReadoutGeom.SignalType(rdvec[rd]->Channel()) == geo::kCollection &&
           rdvec[rd]->Channel() > colChan0 && rdvec[rd]->Channel() < colChan1) {
         fft->AlignedSum(cr, adc);
         fft->AlignedSum(cw, signal);
       }
-      if (geom->SignalType(rdvec[rd]->Channel()) == geo::kInduction) {
+      if (wireReadoutGeom.SignalType(rdvec[rd]->Channel()) == geo::kInduction) {
         if (*max_element(adc.begin(), adc.end()) > pedestal + threshold)
           fRawIndPeak->Fill(*max_element(adc.begin(), adc.end()));
         if (*max_element(signal.begin(), signal.end()) > pedestal + threshold)
           fCalIndPeak->Fill(*max_element(signal.begin(), signal.end()));
       }
-      if (geom->SignalType(rdvec[rd]->Channel()) == geo::kCollection) {
+      if (wireReadoutGeom.SignalType(rdvec[rd]->Channel()) == geo::kCollection) {
         if (*max_element(adc.begin(), adc.end()) > pedestal + threshold)
           fRawColPeak->Fill(*max_element(adc.begin(), adc.end()));
         if (*max_element(signal.begin(), signal.end()) > pedestal + threshold)
@@ -264,7 +254,8 @@ namespace caldata {
       int indMax = TMath::LocMax(signalSize, &adc[0]);
       double sigMin = 0.0;
       double sigMax = TMath::MaxElement(signalSize, &adc[0]);
-      if (geom->SignalType(rdvec[rd]->Channel()) == geo::kInduction && sigMax >= pulseHeight) {
+      if (wireReadoutGeom.SignalType(rdvec[rd]->Channel()) == geo::kInduction &&
+          sigMax >= pulseHeight) {
         int indMin = TMath::LocMin(signalSize, &adc[0]);
         sigMin = TMath::MinElement(signalSize, &adc[0]);
         tmin = std::max(indMax - window, 0);
@@ -285,7 +276,6 @@ namespace caldata {
 
       std::vector<double> winDiffs;
       int cnt = 0;
-      //	for(unsigned int t = tmin; t < tmax; ++t)
       static unsigned int tRawLead = 0;
       for (unsigned int t = 1; t < signalSize; ++t) {
         fDiffsW->Fill(signal[t] - signal[t - 1]);
@@ -315,11 +305,8 @@ namespace caldata {
       }
       fRD_WireMeanDiff2D->Fill(rd, tmp);
       fRD_WireRMSDiff2D->Fill(rd, tmp2);
-
     } //end loop over rawDigits
-
-    return;
-  } //end analyze method
+  }   //end analyze method
 
   DEFINE_ART_MODULE(CalWireAna)
 
