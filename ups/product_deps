@@ -87,7 +87,7 @@
 #>  define_pythonpath
 ####################################
 parent		larevt
-defaultqual	e20
+defaultqual	e26
 ####################################
 
 ####################################
@@ -105,7 +105,7 @@ fcldir	product_dir	job
 
 ####################################
 product         version
-lardata		v09_15_01
+lardata		v09_15_08
 libwda          v2_30_0a
 cetmodules	v3_20_00	-	only_for_build
 end_product_list
@@ -165,12 +165,8 @@ end_product_list
 qualifier	lardata		libwda	notes
 c14:debug	c14:debug	-nq-
 c14:prof	c14:prof	-nq-
-c7:debug	c7:debug	-nq-
-c7:prof		c7:prof		-nq-
 e26:debug	e26:debug	-nq-
 e26:prof	e26:prof	-nq-
-e20:debug	e20:debug	-nq-
-e20:prof	e20:prof	-nq-
 end_qualifier_list
 ####################################
 
