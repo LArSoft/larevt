@@ -20,6 +20,7 @@ namespace lariov {
     virtual bool IsGood(raw::ChannelID_t ch) const = 0;
     virtual bool IsBad(raw::ChannelID_t ch) const = 0;
     virtual bool IsNoisy(raw::ChannelID_t ch) const = 0;
+    virtual bool IsPresent(raw::ChannelID_t ch) const = 0;
     virtual ChannelSet_t NoisyChannels() const = 0;
     virtual chStatus Status(raw::ChannelID_t ch) const = 0;
   };

@@ -30,6 +30,7 @@ namespace lariov {
     {
       return fProviderPtr->IsNoisy(fTimestamp, ch);
     }
+    bool IsPresent(raw::ChannelID_t ch) const override { return fProviderPtr->IsPresent(fTimestamp, ch); }
     ChannelSet_t NoisyChannels() const override { return fProviderPtr->NoisyChannels(fTimestamp); }
     chStatus Status(raw::ChannelID_t ch) const override
     {
