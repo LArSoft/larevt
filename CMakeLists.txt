@@ -8,7 +8,7 @@
 
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-find_package(cetmodules 3.12.00 REQUIRED)
+find_package(cetmodules 3.24.00 REQUIRED)
 project(larevt VERSION 09.10.03 LANGUAGES CXX)
 
 # cetbuildtools contains our cmake modules
@@ -27,7 +27,6 @@ cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 find_package(nusimdata REQUIRED EXPORT)
 
 find_package(art_root_io REQUIRED EXPORT)
-find_package(canvas_root_io REQUIRED)
 find_package(art REQUIRED EXPORT)
 find_package(canvas REQUIRED EXPORT)
 find_package(messagefacility REQUIRED EXPORT)
@@ -46,7 +45,6 @@ find_package(lardata REQUIRED EXPORT)
 find_package(lardataobj REQUIRED EXPORT)
 
 # macros for dictionary and simple_plugin
-include(ArtDictionary)
 include(CetMakeLibrary)
 include(BuildPlugins)
 
