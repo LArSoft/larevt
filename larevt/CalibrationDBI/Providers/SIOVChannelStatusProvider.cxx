@@ -94,7 +94,10 @@ namespace lariov {
 
   // Maybe update method cached data (private const version using current event time).
 
-  bool SIOVChannelStatusProvider::DBUpdate() const { return DBUpdate(fEventTimeStamp); }
+  bool SIOVChannelStatusProvider::DBUpdate() const
+  {
+    return DBUpdate(fEventTimeStamp);
+  }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.

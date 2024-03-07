@@ -116,7 +116,10 @@ namespace lariov {
 
   // Maybe update method cached data (private const version using current event time).
 
-  bool SIOVPmtGainProvider::DBUpdate() const { return DBUpdate(fEventTimeStamp); }
+  bool SIOVPmtGainProvider::DBUpdate() const
+  {
+    return DBUpdate(fEventTimeStamp);
+  }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
@@ -167,7 +170,10 @@ namespace lariov {
     return fData.GetRow(ch);
   }
 
-  float SIOVPmtGainProvider::Gain(DBChannelID_t ch) const { return this->PmtGainObject(ch).Gain(); }
+  float SIOVPmtGainProvider::Gain(DBChannelID_t ch) const
+  {
+    return this->PmtGainObject(ch).Gain();
+  }
 
   float SIOVPmtGainProvider::GainErr(DBChannelID_t ch) const
   {

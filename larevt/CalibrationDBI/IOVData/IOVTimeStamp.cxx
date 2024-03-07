@@ -56,7 +56,10 @@ namespace lariov {
     return IOVTimeStamp(stamp, substamp);
   }
 
-  IOVTimeStamp IOVTimeStamp::MinTimeStamp() { return IOVTimeStamp(0, 0); }
+  IOVTimeStamp IOVTimeStamp::MinTimeStamp()
+  {
+    return IOVTimeStamp(0, 0);
+  }
 
   IOVTimeStamp IOVTimeStamp::MaxTimeStamp()
   {
@@ -92,7 +95,10 @@ namespace lariov {
   }
 
   ///remaining comparison operators implemented in terms of == and <
-  bool IOVTimeStamp::operator!=(const IOVTimeStamp& ts) const { return !(*this == ts); }
+  bool IOVTimeStamp::operator!=(const IOVTimeStamp& ts) const
+  {
+    return !(*this == ts);
+  }
 
   bool IOVTimeStamp::operator<=(const IOVTimeStamp& ts) const
   {
