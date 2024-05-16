@@ -47,7 +47,7 @@ namespace lariov {
     SimpleChannelStatusService(fhicl::ParameterSet const& pset);
 
   private:
-    ChannelStatusDataPtr DataFor(art::Event const& evt) const override;
+    ChannelStatusDataPtr GetDataFor(DBTimeStamp_t ts) const override;
     raw::ChannelID_t fMaxChannel;
     SimpleChannelStatus fProvider;
 

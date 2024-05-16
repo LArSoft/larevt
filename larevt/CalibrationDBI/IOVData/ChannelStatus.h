@@ -24,7 +24,8 @@ namespace lariov {
     kLOWNOISE = 2,
     kNOISY = 3,
     kGOOD = 4,
-    kUNKNOWN = 5
+    kUNKNOWN = 5,
+    kBAD = 6
   };
 
   /**

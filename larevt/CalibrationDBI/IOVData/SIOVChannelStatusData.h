@@ -6,9 +6,10 @@
 #include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
 
 namespace lariov {
-  class SIOVChannelStatusData : public ChannelStatusData {
+  template <typename Provider> 
+  class ChannelStatusDataT : public ChannelStatusData {
   public:
-    SIOVChannelStatusData(SIOVChannelStatusProvider const* p, DBTimeStamp_t t)
+    ChannelStatusDataT(Provider const* p, DBTimeStamp_t t)
       : fProviderPtr(p), fTimestamp(t)
     {}
     ChannelSet_t BadChannels() const override { return fProviderPtr->BadChannels(fTimestamp); }
@@ -26,9 +27,10 @@ namespace lariov {
     }
 
   private:
-    SIOVChannelStatusProvider const* fProviderPtr;
+    Provider const* fProviderPtr;
     DBTimeStamp_t fTimestamp;
   };
+  using SIOVChannelStatusData = ChannelStatusDataT<SIOVChannelStatusProvider>;
 }
 #endif
 

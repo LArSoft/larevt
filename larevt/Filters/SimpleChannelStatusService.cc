@@ -56,9 +56,9 @@ namespace lariov {
 
   } // SimpleChannelStatusService::SimpleChannelStatusService()
 
-  ChannelStatusDataPtr SimpleChannelStatusService::DataFor(art::Event const& evt) const
+  ChannelStatusDataPtr SimpleChannelStatusService::GetDataFor(DBTimeStamp_t ts) const
   {
-    return std::make_shared<SimpleChannelStatusData>(&fProvider, evt.time().value());
+    return std::make_shared<SimpleChannelStatusData>(&fProvider, ts);
   }
 
 }

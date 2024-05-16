@@ -16,7 +16,7 @@
 #include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
 
 // Framework libraries
-#include "art/Framework/Principal/fwd.h"
+#include "art/Framework/Principal/Event.h"
 #include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 
 //forward declarations
@@ -64,9 +64,16 @@ namespace lariov {
    *
    */
   class ChannelStatusService {
+  private: 
+    virtual ChannelStatusDataPtr GetDataFor(DBTimeStamp_t ts) const = 0;
   public:
     virtual ~ChannelStatusService() = default;
-    virtual ChannelStatusDataPtr DataFor(art::Event const& evt) const = 0;
+    ChannelStatusDataPtr DataFor(DBTimeStamp_t ts) const {
+      return GetDataFor(ts);
+    }
+    ChannelStatusDataPtr DataFor(art::Event const& evt) const {
+      return DataFor(evt.time().value());  
+    }
   }; // class ChannelStatusService
 
 } // namespace lariov

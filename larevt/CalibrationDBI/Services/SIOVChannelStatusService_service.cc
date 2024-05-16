@@ -20,9 +20,9 @@ namespace lariov {
     SIOVChannelStatusService(fhicl::ParameterSet const& pset);
 
   private:
-    ChannelStatusDataPtr DataFor(art::Event const& evt) const override
+    ChannelStatusDataPtr GetDataFor(DBTimeStamp_t ts) const override
     {
-      return std::make_shared<SIOVChannelStatusData>(&fProvider, evt.time().value());
+      return std::make_shared<SIOVChannelStatusData>(&fProvider, ts);
     }
     SIOVChannelStatusProvider fProvider;
   };
