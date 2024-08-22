@@ -105,7 +105,7 @@ fcldir	product_dir	job
 
 ####################################
 product         version
-lardata		v09_16_05
+lardata		v09_16_06
 libwda          v2_30_0a
 cetmodules	v3_24_01	-	only_for_build
 end_product_list
