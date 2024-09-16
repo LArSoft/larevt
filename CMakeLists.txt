@@ -9,7 +9,7 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 find_package(cetmodules 3.24.00 REQUIRED)
-project(larevt VERSION 09.10.06 LANGUAGES CXX)
+project(larevt VERSION 09.10.07 LANGUAGES CXX)
 
 # cetbuildtools contains our cmake modules
 
