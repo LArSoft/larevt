@@ -5,8 +5,8 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "cetlib_except/exception.h"
 #include "fhiclcpp/ParameterSet.h" // for Paramete...
-#include "larcore/Geometry/Geometry.h"
-#include "larcorealg/Geometry/GeometryCore.h"             // for wire_id_...
+#include "larcore/Geometry/WireReadout.h"
+#include "larcorealg/Geometry/WireReadoutGeom.h"
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h" // for kCollection
 #include "larevt/CalibrationDBI/IOVData/IOVDataError.h"   // for IOVDataE...
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"   // for IOVTimeS...
@@ -27,7 +27,6 @@ namespace lariov {
     , fCurrentTimeStamp(0)
     , fDataSource(DataSource::Database)
   {
-
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp() - 1, tmp.SubStamp());
@@ -37,13 +36,11 @@ namespace lariov {
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(fhicl::ParameterSet const& p)
     : DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
   {
-
     this->Reconfigure(p);
   }
 
   void DetPedestalRetrievalAlg::Reconfigure(fhicl::ParameterSet const& p)
   {
-
     this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
@@ -85,15 +82,15 @@ namespace lariov {
       DefaultInd.SetPedRms(default_indrms);
       DefaultInd.SetPedRmsErr(default_rms_err);
 
-      art::ServiceHandle<geo::Geometry const> geo;
-      for (auto const& wid : geo->Iterate<geo::WireID>()) {
-        DBChannelID_t ch = geo->PlaneWireToChannel(wid);
+      auto const& wireReadoutGeom = art::ServiceHandle<geo::WireReadout>()->Get();
+      for (auto const& wid : wireReadoutGeom.Iterate<geo::WireID>()) {
+        DBChannelID_t ch = wireReadoutGeom.PlaneWireToChannel(wid);
 
-        if (geo->SignalType(ch) == geo::kCollection) {
+        if (wireReadoutGeom.SignalType(ch) == geo::kCollection) {
           DefaultColl.SetChannel(ch);
           fData.AddOrReplaceRow(DefaultColl);
         }
-        else if (geo->SignalType(ch) == geo::kInduction) {
+        else if (wireReadoutGeom.SignalType(ch) == geo::kInduction) {
           DefaultInd.SetChannel(ch);
           fData.AddOrReplaceRow(DefaultInd);
         }
@@ -154,7 +151,6 @@ namespace lariov {
 
   bool DetPedestalRetrievalAlg::Update(DBTimeStamp_t ts)
   {
-
     fEventTimeStamp = ts;
     return DBUpdate(ts);
   }
@@ -171,7 +167,6 @@ namespace lariov {
 
   bool DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const
   {
-
     // A static mutex that is shared across all invocations of the function.
     static std::mutex mutex;
     std::lock_guard<std::mutex> lock(mutex);

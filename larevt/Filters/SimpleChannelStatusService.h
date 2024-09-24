@@ -50,20 +50,8 @@ namespace lariov {
     SimpleChannelStatusService(fhicl::ParameterSet const& pset);
 
   private:
-    virtual ChannelStatusProvider const& DoGetProvider() const override
-    {
-      return *DoGetProviderPtr();
-    }
-    virtual ChannelStatusProvider const* DoGetProviderPtr() const override
-    {
-      return fProvider.get();
-    }
-
-    /// Update valid channel range
-    void UpdateChannelRange();
-
-    /// React to a new run
-    void postBeginRun(art::Run const& run);
+    ChannelStatusProvider const& DoGetProvider() const override { return *DoGetProviderPtr(); }
+    ChannelStatusProvider const* DoGetProviderPtr() const override { return fProvider.get(); }
 
     std::unique_ptr<SimpleChannelStatus> fProvider;
 

@@ -27,7 +27,7 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // LArSoft includes
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 #include "lardata/ArtDataHelper/WireCreator.h"
 #include "lardata/Utilities/AssociationUtil.h"
@@ -40,20 +40,17 @@
 namespace caldata {
 
   class CalWire : public art::EDProducer {
-
   public:
-    // create calibrated signals on wires. this class runs
-    // an fft to remove the electronics shaping.
+    // create calibrated signals on wires. this class runs an fft to remove the
+    // electronics shaping.
     explicit CalWire(fhicl::ParameterSet const& pset);
 
-    void produce(art::Event& evt);
-    void beginJob();
-
   private:
-    std::string fResponseFile; ///< response file containing transformed
-                               ///< shape histograms and decay constants
-    // for c2: fDataSize is not used
-    // int          fDataSize;          ///< size of raw data on one wire
+    void produce(art::Event& evt) override;
+    void beginJob() override;
+
+    std::string fResponseFile;     ///< response file containing transformed
+                                   ///< shape histograms and decay constants
     int fExpEndBins;               ///< number of end bins to consider for tail fit
     int fPostsample;               ///< number of postsample bins
     std::string fDigitModuleLabel; ///< module that made digits
@@ -70,8 +67,7 @@ namespace caldata {
                                                  ///< have which response functions
     std::vector<int> fKernMapS;                  ///< map telling which channels
                                                  ///< have which response functions
-  protected:
-  }; // class CalWire
+  };                                             // class CalWire
 }
 
 namespace caldata {
@@ -92,7 +88,6 @@ namespace caldata {
   //-------------------------------------------------
   void CalWire::beginJob()
   {
-
     MF_LOG_DEBUG("CalWire") << "CalWire_plugin: Opening  Electronics Response File: "
                             << fResponseFile.c_str();
 
@@ -114,7 +109,6 @@ namespace caldata {
     for (int i = 0; i < respRe->GetXaxis()->GetNbins(); ++i) {
       fKernelR[i].resize(bins);
       for (bin = 0; bin < bins; ++bin) {
-
         const TComplex a(respRe->GetBinContent(i + 1, bin + 1),
                          respIm->GetBinContent(i + 1, bin + 1));
         fKernelR[i][bin] = a;
@@ -153,9 +147,7 @@ namespace caldata {
   //////////////////////////////////////////////////////
   void CalWire::produce(art::Event& evt)
   {
-
-    // get the geometry
-    art::ServiceHandle<geo::Geometry const> geom;
+    art::ServiceHandle<geo::WireReadout const> geom;
 
     std::vector<double> decayConsts;
     std::vector<int> kernMap;
@@ -235,17 +227,15 @@ namespace caldata {
         for (bin = 0; bin < dataSize; ++bin)
           holder[dataSize + bin] = expFit.Eval(bin + dataSize);
       }
-      // This is actually deconvolution, by way of convolution with the inverted
-      // kernel.  This code assumes the response function has already been
-      // been transformed and inverted.  This way a complex multiplication, rather
-      // than a complex division is performed saving 2 multiplications and
-      // 2 divsions
+      // This is actually deconvolution, by way of convolution with the inverted kernel.
+      // This code assumes the response function has already been been transformed and
+      // inverted.  This way a complex multiplication, rather than a complex division is
+      // performed saving 2 multiplications and 2 divsions
 
-      // the example below is for MicroBooNE, experiments should
-      // adapt as appropriate
+      // the example below is for MicroBooNE, experiments should adapt as appropriate
 
       // Figure out which kernel to use (0=induction, 1=collection).
-      geo::SigType_t sigtype = geom->SignalType(channel);
+      geo::SigType_t sigtype = geom->Get().SignalType(channel);
       size_t k;
       if (sigtype == geo::kInduction)
         k = 0;
@@ -267,8 +257,8 @@ namespace caldata {
           holder[bin] -= average;
       }
       wirecol->push_back(recob::WireCreator(holder, *digitVec).move());
-      // add an association between the last object in wirecol
-      // (that we just inserted) and digitVec
+      // add an association between the last object in wirecol (that we just inserted) and
+      // digitVec
       if (!util::CreateAssn(evt, *wirecol, digitVec, *WireDigitAssn)) {
         throw art::Exception(art::errors::ProductRegistrationFailure)
           << "Can't associate wire #" << (wirecol->size() - 1) << " with raw digit #"
@@ -276,18 +266,12 @@ namespace caldata {
       } // if failed to add association
     }   // for raw digits
 
-    if (wirecol->size() == 0) mf::LogWarning("CalWire") << "No wires made for this event.";
+    if (wirecol->empty()) mf::LogWarning("CalWire") << "No wires made for this event.";
 
     evt.put(std::move(wirecol));
     evt.put(std::move(WireDigitAssn));
-
-    return;
   }
 
 } // end namespace caldata
 
-namespace caldata {
-
-  DEFINE_ART_MODULE(CalWire)
-
-} // end namespace caldata
+DEFINE_ART_MODULE(caldata::CalWire)

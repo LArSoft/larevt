@@ -59,22 +59,19 @@ namespace lariov {
     /// @name Single channel queries
     /// @{
     /// Returns whether the specified channel is physical and connected to wire
-    virtual bool IsPresent(raw::ChannelID_t channel) const override;
+    bool IsPresent(raw::ChannelID_t channel) const override;
 
     /// Returns whether the specified channel is physical and good
-    virtual bool IsGood(raw::ChannelID_t channel) const override
+    bool IsGood(raw::ChannelID_t channel) const override
     {
       return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
     }
 
     /// Returns whether the specified channel is bad in the current run
-    virtual bool IsBad(raw::ChannelID_t channel) const override
-    {
-      return fBadChannels.count(channel) > 0;
-    }
+    bool IsBad(raw::ChannelID_t channel) const override { return fBadChannels.count(channel) > 0; }
 
     /// Returns whether the specified channel is noisy in the current run
-    virtual bool IsNoisy(raw::ChannelID_t channel) const override
+    bool IsNoisy(raw::ChannelID_t channel) const override
     {
       return fNoisyChannels.count(channel) > 0;
     }
@@ -83,13 +80,13 @@ namespace lariov {
     /// @name Global channel queries
     /// @{
     /// Returns a copy of set of good channel IDs for the current run
-    virtual ChannelSet_t GoodChannels() const override;
+    ChannelSet_t GoodChannels() const override;
 
     /// Returns a copy of set of bad channel IDs for the current run
-    virtual ChannelSet_t BadChannels() const override { return fBadChannels; }
+    ChannelSet_t BadChannels() const override { return fBadChannels; }
 
     /// Returns a copy of set of noisy channel IDs for the current run
-    virtual ChannelSet_t NoisyChannels() const override { return fNoisyChannels; }
+    ChannelSet_t NoisyChannels() const override { return fNoisyChannels; }
     /// @}
 
     //
@@ -124,12 +121,6 @@ namespace lariov {
      * to be present.
      */
     void Setup(raw::ChannelID_t MaxChannel) { Setup(MaxChannel, MaxChannel); }
-
-    /* TODO DELME
-    /// Prepares the object to provide information about the specified time
-    /// @return always true
-    virtual bool Update(std::uint64_t) override { return true; }
-    */
 
     ///@}
 

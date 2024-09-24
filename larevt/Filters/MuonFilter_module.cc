@@ -8,7 +8,16 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Framework Includes
+// LArSoft includes
+#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "lardataobj/RecoBase/Cluster.h"
+#include "lardataobj/RecoBase/Hit.h"
+
+// Framework includes
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -20,21 +29,13 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-// Larsoft Includes
-#include "larcore/Geometry/Geometry.h"
-#include "larcorealg/Geometry/PlaneGeo.h"
-#include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
-#include "lardataobj/RecoBase/Cluster.h"
-#include "lardataobj/RecoBase/Hit.h"
+// ROOT includes
+#include "TMathBase.h"
 
 // C++ includes
 #include <map>
 #include <memory>
 #include <string>
-
-// ROOT includes
-#include "TMathBase.h"
 
 namespace filter {
 
@@ -74,7 +75,7 @@ namespace filter {
   //-------------------------------------------------
   bool MuonFilter::filter(art::Event& evt)
   {
-    art::ServiceHandle<geo::Geometry const> geom;
+    auto const& wireReadoutGeom = art::ServiceHandle<geo::WireReadout const>()->Get();
     auto const clockData = art::ServiceHandle<detinfo::DetectorClocksService const>()->DataFor(evt);
     auto const detProp =
       art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(evt, clockData);
@@ -86,10 +87,10 @@ namespace filter {
     // This code only works comparing 2 planes so for now these are the
     // last induction plane and collection plane
     geo::TPCID const tpcid{0, 0};
-    unsigned int vPlane = geom->Nplanes(tpcid) - 1;
-    geo::View_t vView = geom->Plane({tpcid, vPlane}).View();
+    unsigned int vPlane = wireReadoutGeom.Nplanes(tpcid) - 1;
+    geo::View_t vView = wireReadoutGeom.Plane({tpcid, vPlane}).View();
     unsigned int uPlane = vPlane - 1;
-    geo::View_t uView = geom->Plane({tpcid, uPlane}).View();
+    geo::View_t uView = wireReadoutGeom.Plane({tpcid, uPlane}).View();
     art::Handle<std::vector<recob::Cluster>> clustHandle;
     evt.getByLabel(fClusterModuleLabel, clustHandle);
 
@@ -156,7 +157,6 @@ namespace filter {
           art::Ptr<recob::Cluster> colSeg = collectionSegments[j];
 
           std::vector<art::Ptr<recob::Hit>> indHits = fmhi.at(i);
-
           std::vector<art::Ptr<recob::Hit>> colHits = fmhc.at(j);
 
           double trk1Start = indSeg->StartTick() + fDelay;
@@ -210,9 +210,11 @@ namespace filter {
             geo::WireID v_wID1(colSeg->Plane(), vPos1);
             geo::WireID v_wID2(colSeg->Plane(), vPos2);
 
-            double y1, y2, z1, z2;
-            geom->IntersectionPoint(u_wID1, v_wID1, y1, z1);
-            geom->IntersectionPoint(u_wID2, v_wID2, y2, z2);
+            auto const intersection1 = wireReadoutGeom.WireIDsIntersect(u_wID1, v_wID1);
+            auto const intersection2 = wireReadoutGeom.WireIDsIntersect(u_wID2, v_wID2);
+            if (!intersection1 || !intersection2) { continue; }
+            auto const [y1, z1] = std::make_pair(intersection1->y, intersection1->z);
+            auto const [y2, z2] = std::make_pair(intersection2->y, intersection2->z);
 
             double const x1 = (trk1Start + trk2Start) / 2.0 * drift - fDCenter;
             double const x2 = (trk1End + trk2End) / 2.0 * drift - fDCenter;
