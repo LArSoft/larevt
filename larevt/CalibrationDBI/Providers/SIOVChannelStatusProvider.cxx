@@ -44,13 +44,14 @@ namespace lariov {
       fDataSource = DataSource::Default;
 
     if (fDataSource == DataSource::Default) {
-      std::cout << "Using default channel status value: " << kGOOD << "\n";
+      mf::LogInfo("SIOVChannelStatusProvider") << "Using default channel status value: " << kGOOD;
       fDefault.SetStatus(kGOOD);
     }
     else if (fDataSource == DataSource::File) {
       cet::search_path sp("FW_SEARCH_PATH");
       std::string abs_fp = sp.find_file(fileName);
-      std::cout << "Using channel statuses from local file: " << abs_fp << "\n";
+      mf::LogInfo("SIOVChannelStatusProvider")
+        << "Using channel statuses from local file: " << abs_fp;
       std::ifstream file(abs_fp);
       if (!file) {
         throw cet::exception("SIOVChannelStatusProvider") << "File " << abs_fp << " is not found.";
@@ -68,7 +69,7 @@ namespace lariov {
       }
     } // if source from file
     else {
-      std::cout << "Using channel statuses from conditions database\n";
+      mf::LogInfo("SIOVChannelStatusProvider") << "Using channel statuses from conditions database";
     }
   }
 
@@ -76,7 +77,7 @@ namespace lariov {
 
   void SIOVChannelStatusProvider::UpdateTimeStamp(DBTimeStamp_t ts)
   {
-    mf::LogInfo("SIOVChannelStatusProvider")
+    MF_LOG_DEBUG("SIOVChannelStatusProvider")
       << "SIOVChannelStatusProvider::UpdateTimeStamp called.";
     fNewNoisy.Clear();
     fEventTimeStamp = ts;
@@ -112,7 +113,7 @@ namespace lariov {
     bool result = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
 
-      mf::LogInfo("SIOVChannelStatusProvider")
+      MF_LOG_DEBUG("SIOVChannelStatusProvider")
         << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
 
       fCurrentTimeStamp = ts;
