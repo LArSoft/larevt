@@ -14,7 +14,6 @@
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
-#include "art/Framework/Principal/View.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "fhiclcpp/ParameterSet.h"
 
@@ -49,22 +48,19 @@ namespace filter {
   bool ADCFilter::filter(art::Event& evt)
   {
     //Read in raw data
-    art::View<raw::RawDigit> rawdigitView;
-    evt.getView(fDigitModuleLabel, rawdigitView);
-
-    if (!rawdigitView.size()) return false;
+    auto const& rawdigits = evt.getProduct<std::vector<raw::RawDigit>>(fDigitModuleLabel);
+    if (!rawdigits.size()) return false;
 
     lariov::ChannelStatusProvider const& channelFilter =
       art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider();
 
     // look through the good channels
-    //      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))
-    for (const raw::RawDigit* digit : rawdigitView) {
-      if (!channelFilter.IsGood(digit->Channel())) continue;
+    for (const raw::RawDigit& digit : rawdigits) {
+      if (!channelFilter.IsGood(digit.Channel())) continue;
       //get ADC values after decompressing
-      std::vector<short> rawadc(digit->Samples());
-      raw::Uncompress(digit->ADCs(), rawadc, digit->Compression());
-      short max = *std::max_element(rawadc.begin(), rawadc.end()) - digit->GetPedestal();
+      std::vector<short> rawadc(digit.Samples());
+      raw::Uncompress(digit.ADCs(), rawadc, digit.Compression());
+      short max = *std::max_element(rawadc.begin(), rawadc.end()) - digit.GetPedestal();
       if (max >= fMinADC) return true; //found one ADC value above threshold, pass filter
     }
 
